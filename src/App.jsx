@@ -2,8 +2,10 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { SimulationLogViewer } from './components/SharedComponents';
 
+
 // Import Layoutu (Nowość)
 import MainLayout from './layout/MainLayout';
+
 
 // Import Modułów (Bez zmian)
 import ModuleImport from './components/ModuleImport';
@@ -14,6 +16,16 @@ import ModuleSimulation from './components/ModuleSimulation';
 import ModuleResults from './components/ModuleResults';
 import { RealTimeViewer } from './components/RealTimeViewer';
 import { GanttViewer } from './components/GanttViewer';
+import { 
+  Upload,            // Import/Eksport
+  Network,           // Marszruty
+  LayoutDashboard,   // Wizualizacja/Konfiguracja
+  ShieldCheck,       // Validator (Audyt)
+  Settings,          // Ustawienia Symulacji
+  FileBarChart,      // Wyniki
+  PlayCircle,        // Real-time
+  CalendarRange      // Gantt
+} from 'lucide-react';
 
 const AppContent = () => {
     // 1. ZACHOWANIE STANU I LOGIKI
@@ -21,14 +33,46 @@ const AppContent = () => {
     
     // Definicja menu (przekażemy ją do Sidebara)
     const modules = [ 
-        { id: 'import', name: 'Import/Eksport', icon: '📂' }, 
-        { id: 'marszruty', name: 'Marszruty', icon: '🗺️' }, 
-        { id: 'wizualizacja', name: 'Konfiguracja Linii', icon: '🏭' }, 
-        { id: 'validator', name: 'Audyt Gemini', icon: '🕵️‍♀️' }, 
-        { id: 'symulacja', name: 'Ustawienia Symulacji', icon: '⚙️' }, 
-        { id: 'wyniki', name: 'Wyniki i KPI', icon: '📊' }, 
-        { id: 'realtime', name: 'Real-time Flow', icon: '📡' }, 
-        { id: 'gantt', name: 'Harmonogram (Gantt)', icon: '📅' },
+{ 
+            id: 'import', 
+            name: 'Import/Eksport', 
+            icon: <Upload size={20} /> 
+        }, 
+        { 
+            id: 'marszruty', 
+            name: 'Marszruty', 
+            icon: <Network size={20} /> 
+        }, 
+        { 
+            id: 'wizualizacja', 
+            name: 'Konfiguracja Linii', 
+            icon: <LayoutDashboard size={20} /> 
+        }, 
+        { 
+            id: 'validator', 
+            name: 'Audyt Gemini', 
+            icon: <ShieldCheck size={20} /> 
+        }, 
+        { 
+            id: 'symulacja', 
+            name: 'Ustawienia Symulacji', 
+            icon: <Settings size={20} /> 
+        }, 
+        { 
+            id: 'wyniki', 
+            name: 'Wyniki i KPI', 
+            icon: <FileBarChart size={20} /> 
+        }, 
+        { 
+            id: 'realtime', 
+            name: 'Real-time Flow', 
+            icon: <PlayCircle size={20} /> 
+        }, 
+        { 
+            id: 'gantt', 
+            name: 'Harmonogram (Gantt)', 
+            icon: <CalendarRange size={20} /> 
+        },
     ];
     
     // Renderowanie warunkowe (Bez zmian)

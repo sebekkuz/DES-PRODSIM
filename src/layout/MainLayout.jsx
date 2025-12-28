@@ -1,29 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 const MainLayout = ({ children, menuItems, activeModule, onModuleChange }) => {
-  // Znajdź nazwę aktywnego modułu do wyświetlenia w Headerze
+  // Domyślnie menu rozwinięte (collapsed = false)
+  const [collapsed, setCollapsed] = useState(false);
+
   const activeItem = menuItems.find(item => item.id === activeModule);
   const currentTitle = activeItem ? activeItem.name : 'ProdSim';
 
   return (
-    <div className="flex h-screen w-screen bg-background overflow-hidden text-text-main font-sans">
-      {/* LEWA STRONA: Sidebar */}
+    <div className="min-h-full bg-slate-50/50">
+      {/* Sidebar */}
       <Sidebar 
         menuItems={menuItems} 
         activeId={activeModule} 
-        onMenuClick={onModuleChange} 
+        onMenuClick={onModuleChange}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
       />
 
-      {/* PRAWA STRONA: Header + Content */}
-      <div className="flex-1 flex flex-col h-full min-w-0 relative">
+      {/* Kontener Główny - Dynamiczny padding 
+         Gdy zwinięty: pl-20 (80px)
+         Gdy rozwinięty: pl-64 (256px) 
+      */}
+      <div 
+        className={`
+            flex flex-col min-h-screen transition-all duration-300 ease-in-out
+            ${collapsed ? 'pl-20' : 'pl-64'}
+        `}
+      >
         <Header title={currentTitle} />
-        
-        {/* Główny kontener na treść (children = renderModule()) */}
-        <main className="flex-1 overflow-y-auto p-6 scroll-smooth">
-          <div className="max-w-[1600px] mx-auto space-y-6">
-            {children}
+
+        <main className="py-8">
+          <div className="px-6 lg:px-8 max-w-[1920px] mx-auto">
+             <div className="fade-in-up">
+                {children}
+             </div>
           </div>
         </main>
       </div>

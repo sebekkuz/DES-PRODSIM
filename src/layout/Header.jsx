@@ -2,19 +2,20 @@ import React from 'react';
 
 const Header = ({ title }) => {
   return (
-    <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-6 shadow-sm z-10">
-      <div className="flex items-center">
-        <h2 className="text-lg font-semibold text-text-main">
-          {title || 'Panel Sterowania'}
-        </h2>
-      </div>
-      <div className="flex items-center space-x-4">
-        {/* Placeholder na przyszłe awatary lub statusy */}
-        <div className="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center text-xs text-text-muted">
-          U
+    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+      {/* Separator dla mobile (opcjonalny, zachowany ze stylu) */}
+      <div className="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
+
+      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+        <div className="flex flex-1 items-center">
+            <h1 className="text-lg font-semibold leading-6 text-gray-900">
+                {title || 'Panel'}
+            </h1>
         </div>
+        
+        {/* Prawa strona pusta - brak "fejkowych" funkcji */}
       </div>
-    </header>
+    </div>
   );
 };
 
