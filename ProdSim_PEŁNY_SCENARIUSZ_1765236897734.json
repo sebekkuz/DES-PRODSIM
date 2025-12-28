@@ -1,0 +1,1826 @@
+{
+  "config": {
+    "stations": [
+      {
+        "id": "sta_1763332336695",
+        "x": 185.6,
+        "y": -13.600000000000016,
+        "name": "OBUDOWA PRZYGOTOWANIE",
+        "type": "podmontaz",
+        "allowedOps": [
+          {
+            "id": "VVS021-M1-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M2-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M3-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M4-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M5-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M1-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M2-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M3-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M4-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M5-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1
+          }
+        ],
+        "capacity": 2,
+        "variance": 0,
+        "failureProb": 0
+      },
+      {
+        "id": "sta_1763332370059",
+        "x": 370.20000000000005,
+        "y": -11.200000000000014,
+        "name": "OBUDOWA MONTAZ",
+        "type": "podmontaz",
+        "allowedOps": [
+          {
+            "id": "VVS021-M1-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M2-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M3-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M4-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-M5-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M1-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M2-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M3-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M4-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-M5-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1
+          }
+        ]
+      },
+      {
+        "id": "sta_1763332456194",
+        "x": 264.2857142857143,
+        "y": 210,
+        "name": "PRZYGOTOWANIE HEX",
+        "type": "podmontaz",
+        "allowedOps": [
+          {
+            "id": "VVS021-P-Wycięcie otworu w obudowach + intalacja profili",
+            "name": "Wycięcie otworu w obudowach + intalacja profili",
+            "time": 0.75,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-P-Wycięcie otworu w obudowach + intalacja profili",
+            "name": "Wycięcie otworu w obudowach + intalacja profili",
+            "time": 0.75,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-P-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.42,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-P-Przygotowanie HEX",
+            "name": "Przygotowanie HEX",
+            "time": 0.13,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-P-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.42,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-P-Przygotowanie HEX",
+            "name": "Przygotowanie HEX",
+            "time": 0.13,
+            "operators": 1
+          }
+        ]
+      },
+      {
+        "id": "sta_1763332603465",
+        "x": 301.3714285714285,
+        "y": 419.9714285714286,
+        "name": "pRZYGOTOWANIE FILTR",
+        "type": "podmontaz",
+        "allowedOps": [
+          {
+            "id": "VVS021-F-Przygotowanie ramki filtra",
+            "name": "Przygotowanie ramki filtra",
+            "time": 0.03,
+            "operators": 1
+          },
+          {
+            "id": "VVS021-F-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.11,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-F-Przygotowanie ramki filtra",
+            "name": "Przygotowanie ramki filtra",
+            "time": 0.03,
+            "operators": 1
+          },
+          {
+            "id": "VVS030-F-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.11,
+            "operators": 1
+          }
+        ]
+      },
+      {
+        "id": "sta_1763332680937",
+        "x": 686.7142857142859,
+        "y": 265.42857142857144,
+        "name": "MONTAZ ",
+        "type": "montaz",
+        "allowedOps": [
+          {
+            "id": "VVS021-F-Montaż ramki filtra",
+            "name": "Montaż ramki filtra",
+            "time": 0.1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-F-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.05,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-P-Instalacja HEX",
+            "name": "Instalacja HEX",
+            "time": 1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-P-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.09,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-F-Montaż ramki filtra",
+            "name": "Montaż ramki filtra",
+            "time": 0.1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-F-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.05,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-P-Instalacja HEX",
+            "name": "Instalacja HEX",
+            "time": 1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-P-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.09,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-M1-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-M2-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-M3-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-M4-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-M5-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-M2-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-M3-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-M4-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-M5-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-M6-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ]
+      },
+      {
+        "id": "sta_1763332904552",
+        "x": 957.3714285714286,
+        "y": 252.60000000000008,
+        "name": "JAKOSC",
+        "type": "jakosci",
+        "allowedOps": []
+      },
+      {
+        "id": "sta_1763332920320",
+        "x": 1259.5714285714287,
+        "y": 308.1428571428571,
+        "name": "PAKOWANIE",
+        "type": "podmontaz",
+        "allowedOps": []
+      }
+    ],
+    "buffers": [
+      {
+        "id": "buf_1763332260553",
+        "x": -2.8285714285714363,
+        "y": 12.399999999999999,
+        "name": "OBUDOWA START",
+        "capacity": 10,
+        "isStartBuffer": true,
+        "isEndBuffer": false,
+        "allowedProductTypes": [
+          "casings_VVS021_M1",
+          "casings_VVS021_M2",
+          "casings_VVS021_M3",
+          "casings_VVS021_M4",
+          "casings_VVS021_M5",
+          "casings_VVS030_M1",
+          "casings_VVS030_M2",
+          "casings_VVS030_M3",
+          "casings_VVS030_M4",
+          "casings_VVS030_M5",
+          "casings_VVS030_M6"
+        ]
+      },
+      {
+        "id": "buf_1763332416600",
+        "x": 674.8000000000001,
+        "y": 51.20000000000002,
+        "name": "OBUDOWY",
+        "capacity": 10,
+        "isStartBuffer": false,
+        "isEndBuffer": false,
+        "allowedProductTypes": [
+          "casings_VVS021_M1",
+          "casings_VVS021_M2",
+          "casings_VVS021_M3",
+          "casings_VVS021_M4",
+          "casings_VVS021_M5",
+          "casings_VVS030_M1",
+          "casings_VVS030_M2",
+          "casings_VVS030_M3",
+          "casings_VVS030_M4",
+          "casings_VVS030_M5",
+          "casings_VVS030_M6"
+        ]
+      },
+      {
+        "id": "buf_1763332488491",
+        "x": 12,
+        "y": 210.71428571428567,
+        "name": "HEX START",
+        "capacity": 10,
+        "isStartBuffer": true,
+        "isEndBuffer": false,
+        "allowedProductTypes": [
+          "functions_VVS021_P",
+          "functions_VVS030_P"
+        ]
+      },
+      {
+        "id": "buf_1763332508886",
+        "x": 9.428571428571374,
+        "y": 420.20000000000005,
+        "name": "FILTR START",
+        "capacity": 10,
+        "isStartBuffer": true,
+        "isEndBuffer": false,
+        "allowedProductTypes": [
+          "functions_VVS021_F",
+          "functions_VVS030_F"
+        ]
+      },
+      {
+        "id": "buf_1763332627501",
+        "x": 532.0000000000001,
+        "y": 206.94285714285715,
+        "name": "HEX BUUFOR",
+        "capacity": 10,
+        "isStartBuffer": false,
+        "isEndBuffer": false,
+        "allowedProductTypes": [
+          "functions_VVS021_P",
+          "functions_VVS030_P"
+        ]
+      },
+      {
+        "id": "buf_1763332645745",
+        "x": 688.3999999999999,
+        "y": 485.60000000000014,
+        "name": "BUFOR FILTR",
+        "capacity": 10,
+        "isStartBuffer": false,
+        "isEndBuffer": false,
+        "allowedProductTypes": [
+          "functions_VVS021_F",
+          "functions_VVS030_F"
+        ]
+      },
+      {
+        "id": "buf_1763333239467",
+        "x": 1517.4,
+        "y": 283.4,
+        "name": "KONIEC",
+        "capacity": 10,
+        "isStartBuffer": false,
+        "isEndBuffer": true,
+        "allowedProductTypes": [
+          "functions_VVS021_F",
+          "functions_VVS021_P",
+          "functions_VVS030_F",
+          "functions_VVS030_P",
+          "casings_VVS021_M1",
+          "casings_VVS021_M2",
+          "casings_VVS021_M3",
+          "casings_VVS021_M4",
+          "casings_VVS021_M5",
+          "casings_VVS030_M1",
+          "casings_VVS030_M2",
+          "casings_VVS030_M3",
+          "casings_VVS030_M4",
+          "casings_VVS030_M5"
+        ]
+      }
+    ],
+    "workerPools": [
+      {
+        "id": "wor_1763488212338",
+        "x": 267,
+        "y": 96.19999999999999,
+        "name": "OBUDOWY PRACOWNICY",
+        "capacity": 2,
+        "speed": 1.2,
+        "costPerHour": 50
+      },
+      {
+        "id": "wor_1763488290507",
+        "x": 390.0000000000001,
+        "y": 296.59999999999997,
+        "name": "HEX PRACOWNIC",
+        "capacity": 1,
+        "speed": 1.2,
+        "costPerHour": 50
+      },
+      {
+        "id": "wor_1763488309496",
+        "x": 817,
+        "y": 378.4000000000001,
+        "name": "MONTAZ PRACOWNIK",
+        "capacity": 1,
+        "speed": 1.2,
+        "costPerHour": 50
+      },
+      {
+        "id": "wor_1763488412845",
+        "x": 1027.0000000000002,
+        "y": 403.39999999999986,
+        "name": "JAKOSC PRACOWNIK",
+        "capacity": 1,
+        "speed": 1.2,
+        "costPerHour": 50
+      },
+      {
+        "id": "wor_1763488443861",
+        "x": 1243.2000000000003,
+        "y": 452.4000000000001,
+        "name": "PAKOWANIE PRACOWNIK",
+        "capacity": 1,
+        "speed": 1.2,
+        "costPerHour": 50
+      },
+      {
+        "id": "wor_1763489334283",
+        "x": 299.34285714285704,
+        "y": 533.6571428571431,
+        "name": "FILTR PRACOWNIK",
+        "capacity": 1,
+        "speed": 1.2,
+        "costPerHour": 50
+      }
+    ],
+    "toolPools": [
+      {
+        "id": "too_1763332958172",
+        "name": "HUB",
+        "capacity": 6,
+        "speed": 0.8
+      }
+    ],
+    "flows": [
+      {
+        "id": "flo_1763332981412",
+        "from": "buf_1763332260553",
+        "to": "sta_1763332336695",
+        "name": "OBUDOWA START (Bufor) -> OBUDOWA PRZYGOTOWANIE (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333004617",
+        "from": "sta_1763332336695",
+        "to": "sta_1763332370059",
+        "name": "OBUDOWA PRZYGOTOWANIE (Stacja) -> OBUDOWA MONTAZ (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333013778",
+        "from": "sta_1763332370059",
+        "to": "buf_1763332416600",
+        "name": "OBUDOWA MONTAZ (Stacja) -> OBUDOWY (Bufor)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333059007",
+        "from": "buf_1763332416600",
+        "to": "sta_1763332680937",
+        "name": "OBUDOWY (Bufor) -> MONTAZ  (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333081179",
+        "from": "sta_1763332456194",
+        "to": "buf_1763332627501",
+        "name": "PRZYGOTOWANIE HEX (Stacja) -> HEX BUUFOR (Bufor)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333105933",
+        "from": "buf_1763332627501",
+        "to": "sta_1763332680937",
+        "name": "HEX BUUFOR (Bufor) -> MONTAZ  (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333122252",
+        "from": "buf_1763332508886",
+        "to": "sta_1763332603465",
+        "name": "FILTR START (Bufor) -> pRZYGOTOWANIE FILTR (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333159789",
+        "from": "sta_1763332603465",
+        "to": "buf_1763332645745",
+        "name": "pRZYGOTOWANIE FILTR (Stacja) -> BUFOR FILTR (Bufor)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333176904",
+        "from": "sta_1763332680937",
+        "to": "sta_1763332904552",
+        "name": "MONTAZ  (Stacja) -> JAKOSC (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333208203",
+        "from": "buf_1763332645745",
+        "to": "sta_1763332680937",
+        "name": "BUFOR FILTR (Bufor) -> MONTAZ  (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333221687",
+        "from": "sta_1763332904552",
+        "to": "sta_1763332920320",
+        "name": "JAKOSC (Stacja) -> PAKOWANIE (Stacja)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763333255714",
+        "from": "sta_1763332920320",
+        "to": "buf_1763333239467",
+        "name": "PAKOWANIE (Stacja) -> KONIEC (Bufor)",
+        "distance": 20
+      },
+      {
+        "id": "flo_1763449917453",
+        "from": "buf_1763332488491",
+        "to": "sta_1763332456194",
+        "name": "P (Bufor) -> P (Stacja)",
+        "distance": 1
+      }
+    ],
+    "workerFlows": [
+      {
+        "id": "wor_1763489124737",
+        "from": "wor_1763488212338",
+        "to": "sta_1763332336695",
+        "distance": 20,
+        "name": "OBUDOWY PRACOWNICY -> OBUDOWA PRZYGOTOWANIE"
+      },
+      {
+        "id": "wor_1763489134910",
+        "from": "wor_1763488212338",
+        "to": "sta_1763332370059",
+        "distance": 20,
+        "name": "OBUDOWY PRACOWNICY -> OBUDOWA MONTAZ"
+      },
+      {
+        "id": "wor_1763489164863",
+        "from": "wor_1763488290507",
+        "to": "sta_1763332456194",
+        "distance": 20,
+        "name": "HEX PRACOWNIC -> PRZYGOTOWANIE HEX"
+      },
+      {
+        "id": "wor_1763489177137",
+        "from": "wor_1763488309496",
+        "to": "sta_1763332680937",
+        "distance": 20,
+        "name": "MONTAZ PRACOWNIK -> MONTAZ "
+      },
+      {
+        "id": "wor_1763489191046",
+        "from": "wor_1763488412845",
+        "to": "sta_1763332904552",
+        "distance": 20,
+        "name": "JAKOSC PRACOWNIK -> JAKOSC"
+      },
+      {
+        "id": "wor_1763489207265",
+        "from": "wor_1763488443861",
+        "to": "sta_1763332920320",
+        "distance": 20,
+        "name": "PAKOWANIE PRACOWNIK -> PAKOWANIE"
+      },
+      {
+        "id": "wor_1763489368775",
+        "from": "wor_1763489334283",
+        "to": "sta_1763332603465",
+        "distance": 20,
+        "name": "FILTR PRACOWNIK -> pRZYGOTOWANIE FILTR"
+      }
+    ],
+    "routings": {
+      "functions_VVS021_F": [
+        {
+          "id": "VVS021-F-Przygotowanie ramki filtra",
+          "name": "Przygotowanie ramki filtra",
+          "time": 0.03,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-F-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.11,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-F-Montaż ramki filtra",
+          "name": "Montaż ramki filtra",
+          "time": 0.1,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-F-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.05,
+          "operators": 1
+        }
+      ],
+      "functions_VVS021_P": [
+        {
+          "id": "VVS021-P-Wycięcie otworu w obudowach + intalacja profili",
+          "name": "Wycięcie otworu w obudowach + intalacja profili",
+          "time": 0.75,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-P-Przygotowanie HEX",
+          "name": "Przygotowanie HEX",
+          "time": 0.13,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-P-Instalacja HEX",
+          "name": "Instalacja HEX",
+          "time": 1,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-P-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.42,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-P-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.09,
+          "operators": 1
+        }
+      ],
+      "functions_VVS030_F": [
+        {
+          "id": "VVS030-F-Przygotowanie ramki filtra",
+          "name": "Przygotowanie ramki filtra",
+          "time": 0.03,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-F-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.11,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-F-Montaż ramki filtra",
+          "name": "Montaż ramki filtra",
+          "time": 0.1,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-F-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.05,
+          "operators": 1
+        }
+      ],
+      "functions_VVS030_P": [
+        {
+          "id": "VVS030-P-Wycięcie otworu w obudowach + intalacja profili",
+          "name": "Wycięcie otworu w obudowach + intalacja profili",
+          "time": 0.75,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-P-Przygotowanie HEX",
+          "name": "Przygotowanie HEX",
+          "time": 0.13,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-P-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.42,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-P-Instalacja HEX",
+          "name": "Instalacja HEX",
+          "time": 1,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-P-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.09,
+          "operators": 1
+        }
+      ],
+      "casings_VVS021_M1": [
+        {
+          "id": "VVS021-M1-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-M1-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS021_M2": [
+        {
+          "id": "VVS021-M2-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-M2-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS021_M3": [
+        {
+          "id": "VVS021-M3-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-M3-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS021_M4": [
+        {
+          "id": "VVS021-M4-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-M4-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS021_M5": [
+        {
+          "id": "VVS021-M5-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS021-M5-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS030_M1": [
+        {
+          "id": "VVS030-M1-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-M1-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS030_M2": [
+        {
+          "id": "VVS030-M2-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-M2-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS030_M3": [
+        {
+          "id": "VVS030-M3-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-M3-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS030_M4": [
+        {
+          "id": "VVS030-M4-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-M4-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "casings_VVS030_M5": [
+        {
+          "id": "VVS030-M5-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.25,
+          "operators": 1
+        },
+        {
+          "id": "VVS030-M5-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.07,
+          "operators": 1
+        }
+      ],
+      "functions_VVS021_F_phase0": [
+        {
+          "id": "VVS021-F-Przygotowanie ramki filtra",
+          "name": "Przygotowanie ramki filtra",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-F-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "functions_VVS021_P_phase0": [
+        {
+          "id": "VVS021-P-Wycięcie otworu w obudowach + intalacja profili",
+          "name": "Wycięcie otworu w obudowach + intalacja profili",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-P-Przygotowanie HEX",
+          "name": "Przygotowanie HEX",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-P-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "functions_VVS030_F_phase0": [
+        {
+          "id": "VVS030-F-Przygotowanie ramki filtra",
+          "name": "Przygotowanie ramki filtra",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-F-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "functions_VVS030_P_phase0": [
+        {
+          "id": "VVS030-P-Wycięcie otworu w obudowach + intalacja profili",
+          "name": "Wycięcie otworu w obudowach + intalacja profili",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-P-Przygotowanie drzwi",
+          "name": "Przygotowanie drzwi",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-P-Przygotowanie HEX",
+          "name": "Przygotowanie HEX",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS021_M1_phase0": [
+        {
+          "id": "VVS021-M1-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-M1-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS021_M2_phase0": [
+        {
+          "id": "VVS021-M2-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-M2-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS021_M3_phase0": [
+        {
+          "id": "VVS021-M3-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-M3-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS021_M4_phase0": [
+        {
+          "id": "VVS021-M4-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-M4-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS021_M5_phase0": [
+        {
+          "id": "VVS021-M5-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS021-M5-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS030_M1_phase0": [
+        {
+          "id": "VVS030-M1-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-M1-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS030_M2_phase0": [
+        {
+          "id": "VVS030-M2-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-M2-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS030_M3_phase0": [
+        {
+          "id": "VVS030-M3-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-M3-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS030_M4_phase0": [
+        {
+          "id": "VVS030-M4-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-M4-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS030_M5_phase0": [
+        {
+          "id": "VVS030-M5-Montaż obudowy (typ C )",
+          "name": "Montaż obudowy (typ C )",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        },
+        {
+          "id": "VVS030-M5-Zaciskanie paneli",
+          "name": "Zaciskanie paneli",
+          "time": 0.03,
+          "operators": 1,
+          "montaz": 0
+        }
+      ],
+      "casings_VVS021_M1_phase1": [
+        {
+          "id": "VVS021-M1-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS021_M2_phase1": [
+        {
+          "id": "VVS021-M2-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS021_M3_phase1": [
+        {
+          "id": "VVS021-M3-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS021_M4_phase1": [
+        {
+          "id": "VVS021-M4-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS021_M5_phase1": [
+        {
+          "id": "VVS021-M5-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS030_M2_phase1": [
+        {
+          "id": "VVS030-M2-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS030_M3_phase1": [
+        {
+          "id": "VVS030-M3-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS030_M4_phase1": [
+        {
+          "id": "VVS030-M4-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS030_M5_phase1": [
+        {
+          "id": "VVS030-M5-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "casings_VVS030_M6_phase1": [
+        {
+          "id": "VVS030-M6-Wykańczanie",
+          "name": "Wykańczanie",
+          "time": 0.07,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "functions_VVS021_F_phase1": [
+        {
+          "id": "VVS021-F-Montaż ramki filtra",
+          "name": "Montaż ramki filtra",
+          "time": 0.1,
+          "operators": 1,
+          "montaz": 1
+        },
+        {
+          "id": "VVS021-F-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.05,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "functions_VVS021_P_phase1": [
+        {
+          "id": "VVS021-P-Instalacja HEX",
+          "name": "Instalacja HEX",
+          "time": 1,
+          "operators": 1,
+          "montaz": 1
+        },
+        {
+          "id": "VVS021-P-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.09,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "functions_VVS030_F_phase1": [
+        {
+          "id": "VVS030-F-Montaż ramki filtra",
+          "name": "Montaż ramki filtra",
+          "time": 0.1,
+          "operators": 1,
+          "montaz": 1
+        },
+        {
+          "id": "VVS030-F-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.05,
+          "operators": 1,
+          "montaz": 1
+        }
+      ],
+      "functions_VVS030_P_phase1": [
+        {
+          "id": "VVS030-P-Instalacja HEX",
+          "name": "Instalacja HEX",
+          "time": 1,
+          "operators": 1,
+          "montaz": 1
+        },
+        {
+          "id": "VVS030-P-Montaż drzwi",
+          "name": "Montaż drzwi",
+          "time": 0.09,
+          "operators": 1,
+          "montaz": 1
+        }
+      ]
+    }
+  },
+  "settings": {
+    "startDate": "18-11-2025",
+    "targetTakt": 0,
+    "qualitySettings": {
+      "VVS021": {
+        "baseTime": 0.3,
+        "functionTimes": {
+          "F": 0.3,
+          "P": 0.3
+        }
+      },
+      "VVS030": {
+        "baseTime": 0.3,
+        "functionTimes": {
+          "F": 0.3,
+          "P": 0.3
+        }
+      }
+    },
+    "packingSettings": {
+      "VVS021": {
+        "baseTime": 0.3,
+        "functionTimes": {
+          "F": 0.3,
+          "P": 0.3
+        }
+      },
+      "VVS030": {
+        "baseTime": 0.3,
+        "functionTimes": {
+          "F": 0.3,
+          "P": 0.3
+        }
+      }
+    },
+    "assemblySequence": [
+      "F",
+      "P",
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5",
+      "M6"
+    ],
+    "shifts": {
+      "1": {
+        "active": true,
+        "days": 5,
+        "start": "00:00",
+        "end": "23:59"
+      },
+      "2": {
+        "active": false,
+        "days": 5,
+        "start": "14:00",
+        "end": "22:00"
+      },
+      "3": {
+        "active": false,
+        "days": 5,
+        "start": "22:00",
+        "end": "06:00"
+      },
+      "4": {
+        "active": false,
+        "days": 2,
+        "start": "08:00",
+        "end": "16:00"
+      }
+    }
+  },
+  "db": {
+    "functions": {
+      "VVS021": {
+        "F": [
+          {
+            "id": "VVS021-F-Montaż ramki filtra",
+            "name": "Montaż ramki filtra",
+            "time": 0.1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-F-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.05,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-F-Przygotowanie ramki filtra",
+            "name": "Przygotowanie ramki filtra",
+            "time": 0.03,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-F-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.11,
+            "operators": 1,
+            "montaz": 0
+          }
+        ],
+        "P": [
+          {
+            "id": "VVS021-P-Instalacja HEX",
+            "name": "Instalacja HEX",
+            "time": 1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS021-P-Wycięcie otworu w obudowach + intalacja profili",
+            "name": "Wycięcie otworu w obudowach + intalacja profili",
+            "time": 0.75,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-P-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.42,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-P-Przygotowanie HEX",
+            "name": "Przygotowanie HEX",
+            "time": 0.13,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-P-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.09,
+            "operators": 1,
+            "montaz": 1
+          }
+        ]
+      },
+      "VVS030": {
+        "F": [
+          {
+            "id": "VVS030-F-Montaż ramki filtra",
+            "name": "Montaż ramki filtra",
+            "time": 0.1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-F-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.05,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-F-Przygotowanie ramki filtra",
+            "name": "Przygotowanie ramki filtra",
+            "time": 0.03,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-F-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.11,
+            "operators": 1,
+            "montaz": 0
+          }
+        ],
+        "P": [
+          {
+            "id": "VVS030-P-Instalacja HEX",
+            "name": "Instalacja HEX",
+            "time": 1,
+            "operators": 1,
+            "montaz": 1
+          },
+          {
+            "id": "VVS030-P-Wycięcie otworu w obudowach + intalacja profili",
+            "name": "Wycięcie otworu w obudowach + intalacja profili",
+            "time": 0.75,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-P-Przygotowanie drzwi",
+            "name": "Przygotowanie drzwi",
+            "time": 0.42,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-P-Przygotowanie HEX",
+            "name": "Przygotowanie HEX",
+            "time": 0.13,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-P-Montaż drzwi",
+            "name": "Montaż drzwi",
+            "time": 0.09,
+            "operators": 1,
+            "montaz": 1
+          }
+        ]
+      }
+    },
+    "casings": {
+      "VVS021": {
+        "M1": [
+          {
+            "id": "VVS021-M1-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M1-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M1-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M2": [
+          {
+            "id": "VVS021-M2-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M2-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M2-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M3": [
+          {
+            "id": "VVS021-M3-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M3-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M3-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M4": [
+          {
+            "id": "VVS021-M4-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M4-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M4-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M5": [
+          {
+            "id": "VVS021-M5-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M5-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS021-M5-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ]
+      },
+      "VVS030": {
+        "M1": [
+          {
+            "id": "VVS030-M1-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M1-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          }
+        ],
+        "M6": [
+          {
+            "id": "VVS030-M6-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M2": [
+          {
+            "id": "VVS030-M2-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M2-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M2-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M3": [
+          {
+            "id": "VVS030-M3-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M3-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M3-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M4": [
+          {
+            "id": "VVS030-M4-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M4-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M4-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ],
+        "M5": [
+          {
+            "id": "VVS030-M5-Zaciskanie paneli",
+            "name": "Zaciskanie paneli",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M5-Montaż obudowy (typ C )",
+            "name": "Montaż obudowy (typ C )",
+            "time": 0.25,
+            "operators": 1,
+            "montaz": 0
+          },
+          {
+            "id": "VVS030-M5-Wykańczanie",
+            "name": "Wykańczanie",
+            "time": 0.07,
+            "operators": 1,
+            "montaz": 1
+          }
+        ]
+      }
+    }
+  },
+  "mrp": [
+    {
+      "Data  zlecenia": "18-11-2025",
+      "Rozmiar": "VVS030",
+      "Sekcje": "M3-P"
+    },
+    {
+      "Data  zlecenia": "18-11-2025",
+      "Rozmiar": "VVS021",
+      "Sekcje": "M2-FP-M2-F"
+    },
+    {
+      "Data  zlecenia": "18-11-2025",
+      "Rozmiar": "VVS021",
+      "Sekcje": "M4-F"
+    }
+  ]
+}
