@@ -78,7 +78,7 @@ export default function ModuleValidator() {
     const warningCount = issues.filter(i => i.type === 'warning').length;
 
     return (
-        <div className="max-w-6xl mx-auto pb-10">
+        <div className="max-w-4xl mx-auto bg-surface shadow-card rounded-xl p-8 border border-border space-y-6">
             <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-bold text-gray-800 flex items-center">

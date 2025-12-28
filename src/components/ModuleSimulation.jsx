@@ -26,7 +26,7 @@ const ModuleAssemblySettings = () => {
     const moveItem = (index, direction) => { const newSeq = [...sequence]; if (index + direction < 0 || index + direction >= newSeq.length) return; [newSeq[index], newSeq[index + direction]] = [newSeq[index + direction], newSeq[index]]; setSimulationSettings(prev => ({ ...prev, assemblySequence: newSeq })); };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <div className="w-full bg-background rounded-xl p-6 border border-border">
             <h3 className="text-lg font-semibold mb-4">Globalna Kolejność Montażu</h3>
             <div className="grid grid-cols-2 gap-6">
                 <div className="border p-3 rounded-lg">
@@ -113,7 +113,7 @@ export default function ModuleSimulation() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg space-y-8">
+        <div className="max-w-4xl mx-auto bg-surface shadow-card rounded-xl p-8 border border-border space-y-8">
             <div className="flex justify-between items-start">
                  <div>
                     <h3 className="text-lg font-semibold mb-4">Ustawienia Symulacji</h3>

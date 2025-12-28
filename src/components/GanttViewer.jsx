@@ -414,7 +414,7 @@ export const GanttViewer = ({ config, simulationData }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-900 text-white overflow-hidden">
+      <div className="flex flex-col h-[82vh] bg-gray-900 shadow-card rounded-xl border border-border overflow-hidden text-white font-sans">
             {/* TOOLBAR */}
             <div className="h-12 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4 shadow-md shrink-0">
                 <div className="flex items-center space-x-4">

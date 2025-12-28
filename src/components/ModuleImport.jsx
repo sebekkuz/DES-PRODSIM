@@ -95,7 +95,7 @@ export default function ModuleImport() {
     }; 
 
     return ( 
-        <div className="max-w-6xl mx-auto space-y-6 pb-10">
+        <div className="max-w-4xl mx-auto bg-surface shadow-card rounded-xl p-8 border border-border">
             <div className="bg-blue-50 p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
                 <h3 className="text-xl font-bold mb-2 text-blue-800">Zarządzanie Pełnym Scenariuszem</h3>
                 <p className="text-sm text-blue-600 mb-4">

@@ -2,26 +2,28 @@ import React from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children, menuItems, activeModule, onModuleChange }) => {
+  // Znajdź nazwę aktywnego modułu do wyświetlenia w Headerze
+  const activeItem = menuItems.find(item => item.id === activeModule);
+  const currentTitle = activeItem ? activeItem.name : 'ProdSim';
+
   return (
-    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
-      <Sidebar />
-      
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
+    <div className="flex h-screen w-screen bg-background overflow-hidden text-text-main font-sans">
+      {/* LEWA STRONA: Sidebar */}
+      <Sidebar 
+        menuItems={menuItems} 
+        activeId={activeModule} 
+        onMenuClick={onModuleChange} 
+      />
+
+      {/* PRAWA STRONA: Header + Content */}
+      <div className="flex-1 flex flex-col h-full min-w-0 relative">
+        <Header title={currentTitle} />
         
-        <main className="flex-1 relative overflow-hidden">
-          {/* Tło w kropki (Dot Pattern) */}
-          <div className="absolute inset-0 z-0 opacity-[0.4]"
-               style={{
-                 backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
-                 backgroundSize: '24px 24px'
-               }}>
-          </div>
-          
-          {/* Obszar roboczy (Canvas Container) */}
-          <div className="relative z-0 h-full w-full overflow-auto">
-             {children}
+        {/* Główny kontener na treść (children = renderModule()) */}
+        <main className="flex-1 overflow-y-auto p-6 scroll-smooth">
+          <div className="max-w-[1600px] mx-auto space-y-6">
+            {children}
           </div>
         </main>
       </div>

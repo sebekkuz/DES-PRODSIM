@@ -330,7 +330,7 @@ export default function ModuleVisualization() {
     const [openAccordion, setOpenAccordion] = useState('stations'); 
     return ( 
         <div className="flex flex-col md:flex-row h-full max-h-[85vh] gap-4"> 
-            <div className="w-full md:w-1/3 bg-white rounded-lg shadow-lg overflow-y-auto"> 
+            <div className="w-full md:w-1/3 bg-surface rounded-xl shadow-card border border-border overflow-y-auto"> 
                 <h3 className="text-lg font-semibold mb-1 p-4">Konfiguracja Linii</h3> 
                 <AccordionItem title="🏭 Stacje" id="stations" open={openAccordion} setOpen={setOpenAccordion}><ModuleStation /></AccordionItem> 
                 <AccordionItem title="📦 Bufory" id="buffers" open={openAccordion} setOpen={setOpenAccordion}><ModuleBuffer /></AccordionItem> 
@@ -338,7 +338,7 @@ export default function ModuleVisualization() {
                 <AccordionItem title="➡️ Przepływy" id="flows" open={openAccordion} setOpen={setOpenAccordion}><ModuleFlows /></AccordionItem> 
             </div> 
             <div className="flex-1 md:mt-0"> 
-                <div className="bg-white p-4 rounded-lg shadow-lg h-full flex flex-col"> 
+                <div className="bg-surface p-4 rounded-xl shadow-card border border-border h-full flex flex-col"> 
                     <h3 className="text-lg font-semibold mb-2 flex justify-between"><span>Podgląd Linii 2D</span> <span className="text-xs font-normal text-gray-500">Przesuń myszką, kółko = zoom</span></h3> 
                     <div className="flex-1 min-h-[400px]"> 
                         <VisualizationCanvas /> 

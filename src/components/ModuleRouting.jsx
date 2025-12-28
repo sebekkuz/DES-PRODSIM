@@ -68,7 +68,7 @@ export default function ModuleRouting() {
     };
     
     return ( 
-        <div className="max-w-5xl mx-auto space-y-4">
+        <div className="max-w-6xl mx-auto bg-surface shadow-card rounded-xl p-8 border border-border h-[80vh] flex flex-col">
             <div className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Edytor Marszrut</h3>
                 <div className="flex space-x-2">

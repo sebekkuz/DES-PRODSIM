@@ -690,7 +690,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-900 text-white overflow-hidden">
+       <div className="flex flex-col h-[82vh] bg-gray-900 shadow-card rounded-xl border border-border overflow-hidden text-white font-sans">
             <div className="h-14 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4 shadow-md z-20 shrink-0">
                 <div className="flex items-center space-x-6">
                     <div className="flex flex-col"><span className="text-[10px] text-gray-400 uppercase font-bold">Czas Symulacji</span><div className="text-lg font-mono text-blue-400 font-bold">{currentShiftInfo.dateStr}</div></div>

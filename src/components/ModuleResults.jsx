@@ -83,7 +83,7 @@ export default function ModuleResults() {
     const taktStatusColor = taktDiff > 0 ? "text-red-600" : "text-green-600";
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 pb-10">
+        <div className="max-w-7xl mx-auto bg-surface shadow-card rounded-xl p-8 border border-border space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
                     <h4 className="text-xs text-gray-500 uppercase font-bold">Supply Chain (OTIF)</h4>
