@@ -2,12 +2,24 @@
 'use strict';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+    GanttChart, 
+    ZoomIn, 
+    ZoomOut, 
+    ChevronLeft, 
+    ChevronRight, 
+    Layers, 
+    Users, 
+    CalendarClock,
+    MousePointer2,
+    MonitorPlay
+} from 'lucide-react';
 
 export const GanttViewer = ({ config, simulationData }) => {
 
     // === KONFIGURACJA WIDOKU ===
     const [viewMode, setViewMode] = useState('STATIONS'); // 'STATIONS' lub 'RESOURCES'
-    const [zoom, setZoom] = useState(20); // Pixels per hour
+    const [zoom, setZoom] = useState(40); // Pixels per hour (domyślnie trochę szerzej)
     const [scrollX, setScrollX] = useState(0);
     const [hoveredBlock, setHoveredBlock] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -25,11 +37,20 @@ export const GanttViewer = ({ config, simulationData }) => {
         RUN: '#22c55e',      // Zielony
         IDLE: '#eab308',     // Żółty
         BLOCKED: '#ef4444',  // Czerwony
-        OFFLINE: '#6b21a8',  // Fioletowy
+        OFFLINE: '#94a3b8',  // Szary (zmieniono z fioletu dla estetyki)
         PROCESSING: '#22c55e', // Praca zasobu
         TRANSPORT: '#3b82f6',  // Transport zasobu
-        TRAVEL: '#93c5fd'      // Dojazd pracownika (Worker Travel)
+        TRAVEL: '#93c5fd'      // Dojazd pracownika
     };
+
+    const LEGEND_ITEMS = [
+        { label: 'Praca / Proces', color: COLORS.RUN },
+        { label: 'Oczekiwanie (Idle)', color: COLORS.IDLE },
+        { label: 'Blokada', color: COLORS.BLOCKED },
+        { label: 'Transport', color: COLORS.TRANSPORT },
+        { label: 'Dojazd (Travel)', color: COLORS.TRAVEL },
+        { label: 'Offline / Przerwa', color: COLORS.OFFLINE },
+    ];
 
     // Helper: Parsowanie czasu "HH:MM" -> float
     const parseTimeStr = (str) => {
@@ -46,7 +67,6 @@ export const GanttViewer = ({ config, simulationData }) => {
         const duration = simulationData.duration || 24;
         const shiftStarts = [];
 
-        // Generujemy wszystkie momenty startu zmian w czasie trwania symulacji
         const days = Math.ceil(duration / 24);
         for (let d = 0; d <= days; d++) {
             Object.values(settings).forEach(shift => {
@@ -56,20 +76,16 @@ export const GanttViewer = ({ config, simulationData }) => {
                 if (time <= duration) shiftStarts.push(time);
             });
         }
-        // Sortujemy rosnąco
         shiftStarts.sort((a, b) => a - b);
-        // Usuwamy duplikaty (jeśli są)
         const uniqueStarts = [...new Set(shiftStarts)];
 
         const currentH = scrollX / zoom;
         let targetH = currentH;
 
         if (direction === 'next') {
-            // Znajdź pierwszy start większy niż obecny czas (+ margines błędu)
             const next = uniqueStarts.find(t => t > currentH + 0.5);
             if (next !== undefined) targetH = next;
         } else {
-            // Znajdź ostatni start mniejszy niż obecny czas
             const prev = [...uniqueStarts].reverse().find(t => t < currentH - 0.5);
             if (prev !== undefined) targetH = prev;
             else targetH = 0;
@@ -86,7 +102,6 @@ export const GanttViewer = ({ config, simulationData }) => {
         let processedRows = [];
 
         if (viewMode === 'STATIONS') {
-            // --- TRYB STACJE ---
             config.stations.forEach(s => {
                 const intervals = [];
                 const events = simulationData.replayEvents
@@ -128,7 +143,6 @@ export const GanttViewer = ({ config, simulationData }) => {
             });
 
         } else {
-            // --- TRYB ZASOBY ---
             const allPools = [...config.workerPools, ...config.toolPools];
             allPools.forEach(pool => {
                 const usageEvents = simulationData.replayEvents.filter(e => e.type === 'RESOURCE_USAGE' && e.poolId === pool.id);
@@ -158,7 +172,6 @@ export const GanttViewer = ({ config, simulationData }) => {
 
                 rawIntervals.sort((a, b) => a.start - b.start);
 
-                // Lane Packing
                 const lanes = [];
                 const packedIntervals = [];
 
@@ -197,7 +210,7 @@ export const GanttViewer = ({ config, simulationData }) => {
         return { rows: processedRows, maxTime: simEnd };
     }, [simulationData, config, viewMode]);
 
-    // === 3. RYSOWANIE ===
+    // === 3. RYSOWANIE (LIGHT MODE) ===
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -215,14 +228,14 @@ export const GanttViewer = ({ config, simulationData }) => {
         canvas.style.height = `${canvasHeight}px`;
         ctx.scale(dpr, dpr);
 
-        // Tło
-        ctx.fillStyle = "#1e293b"; 
+        // TŁO: Białe (Light Mode)
+        ctx.fillStyle = "#ffffff"; 
         ctx.fillRect(0, 0, totalWidth, canvasHeight);
 
         ctx.save();
         ctx.translate(SIDEBAR_WIDTH, HEADER_HEIGHT);
         
-        // --- RYSOWANIE LINI ZMIAN (Shift Markers) ---
+        // --- RYSOWANIE LINI ZMIAN ---
         if (simulationData?.shiftSettings) {
             const settings = simulationData.shiftSettings;
             const duration = simulationData.duration || 100;
@@ -235,56 +248,52 @@ export const GanttViewer = ({ config, simulationData }) => {
                     const startH = parseTimeStr(shift.start);
                     const endH = parseTimeStr(shift.end);
                     
-                    // Czas startu w symulacji
-                    const timeStart = d * 24 + startH;
-                    const xStart = timeStart * zoom - scrollX;
-
-                    // Czas końca (obsługa zmiany nocnej)
+                    let timeStart = d * 24 + startH;
                     let timeEnd = d * 24 + endH;
                     if (endH < startH) timeEnd += 24; 
+
+                    const xStart = timeStart * zoom - scrollX;
                     const xEnd = timeEnd * zoom - scrollX;
 
-                    // Rysuj Start (Zielony przerywany)
+                    // Start Zmiany (Zielony)
                     if (xStart >= -50 && xStart <= totalWidth) {
                         ctx.beginPath();
-                        ctx.strokeStyle = "rgba(74, 222, 128, 0.4)";
+                        ctx.strokeStyle = "rgba(22, 163, 74, 0.4)"; // green-600
                         ctx.lineWidth = 2;
-                        ctx.setLineDash([5, 5]);
-                        ctx.moveTo(xStart, 0);
-                        ctx.lineTo(xStart, canvasHeight);
+                        ctx.setLineDash([4, 4]);
+                        ctx.moveTo(xStart, 0); ctx.lineTo(xStart, canvasHeight);
                         ctx.stroke();
                         
-                        ctx.fillStyle = "rgba(74, 222, 128, 0.8)";
-                        ctx.font = "10px Arial";
+                        ctx.fillStyle = "rgba(22, 163, 74, 1)";
+                        ctx.font = "bold 10px sans-serif";
                         ctx.textAlign = "left";
                         ctx.fillText("START", xStart + 4, 15);
                     }
 
-                    // Rysuj Koniec (Czerwony przerywany)
+                    // Koniec Zmiany (Czerwony)
                     if (xEnd >= -50 && xEnd <= totalWidth) {
                         ctx.beginPath();
-                        ctx.strokeStyle = "rgba(248, 113, 113, 0.4)";
+                        ctx.strokeStyle = "rgba(220, 38, 38, 0.4)"; // red-600
                         ctx.lineWidth = 2;
-                        ctx.setLineDash([5, 5]);
-                        ctx.moveTo(xEnd, 0);
-                        ctx.lineTo(xEnd, canvasHeight);
+                        ctx.setLineDash([4, 4]);
+                        ctx.moveTo(xEnd, 0); ctx.lineTo(xEnd, canvasHeight);
                         ctx.stroke();
 
-                        ctx.fillStyle = "rgba(248, 113, 113, 0.8)";
-                        ctx.font = "10px Arial";
+                        ctx.fillStyle = "rgba(220, 38, 38, 1)";
+                        ctx.font = "bold 10px sans-serif";
                         ctx.textAlign = "right";
                         ctx.fillText("KONIEC", xEnd - 4, canvasHeight - 10);
                     }
                 });
             }
-            ctx.setLineDash([]); // Reset
+            ctx.setLineDash([]);
         }
 
-        // Grid godzinowy
+        // --- GRID GODZINOWY ---
         const visibleStart = scrollX / zoom;
         const visibleEnd = (scrollX + totalWidth - SIDEBAR_WIDTH) / zoom;
         
-        ctx.strokeStyle = "#334155";
+        ctx.strokeStyle = "#f1f5f9"; // slate-100 (bardzo delikatna siatka)
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (let h = Math.floor(visibleStart); h <= Math.ceil(visibleEnd); h++) {
@@ -293,12 +302,13 @@ export const GanttViewer = ({ config, simulationData }) => {
         }
         ctx.stroke();
 
-        // Rysowanie Wierszy
+        // --- WIERSZE DANYCH ---
         let currentY = 0;
         rows.forEach((row, idx) => {
+            // Zebra striping (delikatny szary)
             if (idx % 2 === 0) {
-                ctx.fillStyle = "rgba(255,255,255,0.02)";
-                ctx.fillRect(-scrollX, currentY, maxTime * zoom, row.height);
+                ctx.fillStyle = "#f8fafc"; // slate-50
+                ctx.fillRect(-scrollX, currentY, Math.max(maxTime * zoom, totalWidth), row.height);
             }
 
             row.intervals.forEach(block => {
@@ -315,17 +325,21 @@ export const GanttViewer = ({ config, simulationData }) => {
                     h = row.laneHeight - 4;
                 }
 
-                ctx.fillStyle = COLORS[block.status] || '#888';
-                ctx.beginPath(); ctx.roundRect(x, y, w, h, 2); ctx.fill();
+                ctx.fillStyle = COLORS[block.status] || '#cbd5e1';
+                ctx.beginPath(); ctx.roundRect(x, y, w, h, 3); ctx.fill(); // Zaokrąglone rogi
 
-                if (w > 20 && !row.isPool) {
-                    ctx.fillStyle = "#fff"; ctx.font = "10px Arial"; ctx.textAlign = "center";
+                // Tekst na bloku (jeśli się mieści)
+                if (w > 25 && !row.isPool) {
+                    ctx.fillStyle = "#ffffff"; 
+                    ctx.font = "bold 10px sans-serif"; 
+                    ctx.textAlign = "center";
                     const label = block.meta?.order ? `${block.meta.order}` : block.status;
                     ctx.fillText(label, x + w/2, y + h/2 + 3);
                 }
             });
 
-            ctx.strokeStyle = "#475569";
+            // Linia podziału wierszy
+            ctx.strokeStyle = "#e2e8f0"; // slate-200
             ctx.beginPath(); ctx.moveTo(-scrollX, currentY + row.height); ctx.lineTo(totalWidth, currentY + row.height); ctx.stroke();
 
             currentY += row.height;
@@ -333,34 +347,47 @@ export const GanttViewer = ({ config, simulationData }) => {
         
         ctx.restore();
 
-        // --- SIDEBAR (Fixed Left) ---
+        // --- LEWY SIDEBAR (Wewnątrz Canvas) ---
         ctx.save();
-        ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, SIDEBAR_WIDTH, canvasHeight);
-        ctx.strokeStyle = "#475569"; ctx.beginPath(); ctx.moveTo(SIDEBAR_WIDTH, 0); ctx.lineTo(SIDEBAR_WIDTH, canvasHeight); ctx.stroke();
-
-        ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, SIDEBAR_WIDTH, HEADER_HEIGHT);
-        ctx.fillStyle = "#fff"; ctx.font = "bold 12px Arial"; ctx.textAlign = "left";
-        ctx.fillText(viewMode === 'STATIONS' ? "STACJA ROBOCZA" : "ZASÓB (PULA)", 10, 25);
+        // Tło nagłówków wierszy
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, SIDEBAR_WIDTH, canvasHeight);
+        // Prawa krawędź sidebara
+        ctx.strokeStyle = "#cbd5e1"; ctx.beginPath(); ctx.moveTo(SIDEBAR_WIDTH, 0); ctx.lineTo(SIDEBAR_WIDTH, canvasHeight); ctx.stroke();
+        
+        // Header Sidebara (lewy górny róg)
+        ctx.fillStyle = "#f1f5f9"; ctx.fillRect(0, 0, SIDEBAR_WIDTH, HEADER_HEIGHT);
+        ctx.fillStyle = "#475569"; ctx.font = "bold 11px sans-serif"; ctx.textAlign = "left";
+        ctx.fillText(viewMode === 'STATIONS' ? "STACJA ROBOCZA" : "ZASÓB (PULA)", 15, 25);
+        
+        // Separator pod headerem
+        ctx.strokeStyle = "#e2e8f0"; ctx.beginPath(); ctx.moveTo(0, HEADER_HEIGHT); ctx.lineTo(SIDEBAR_WIDTH, HEADER_HEIGHT); ctx.stroke();
 
         let sideY = HEADER_HEIGHT;
         rows.forEach(row => {
-            ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 11px Arial"; ctx.fillText(row.name, 10, sideY + 20);
-            ctx.fillStyle = "#64748b"; ctx.font = "10px Arial"; ctx.fillText(row.subTitle, 10, sideY + 35);
-            ctx.strokeStyle = "#334155"; ctx.beginPath(); ctx.moveTo(0, sideY + row.height); ctx.lineTo(SIDEBAR_WIDTH, sideY + row.height); ctx.stroke();
+            // Nazwa wiersza
+            ctx.fillStyle = "#334155"; ctx.font = "bold 11px sans-serif"; ctx.fillText(row.name, 15, sideY + 20);
+            // Podtytuł
+            ctx.fillStyle = "#94a3b8"; ctx.font = "10px sans-serif"; ctx.fillText(row.subTitle, 15, sideY + 35);
+            // Linia separatora
+            ctx.strokeStyle = "#e2e8f0"; ctx.beginPath(); ctx.moveTo(0, sideY + row.height); ctx.lineTo(SIDEBAR_WIDTH, sideY + row.height); ctx.stroke();
             sideY += row.height;
         });
         ctx.restore();
 
-        // --- TIMELINE HEADER (Fixed Top) ---
+        // --- NAGŁÓWEK CZASU (Fixed Top) ---
         ctx.save();
-        ctx.fillStyle = "#0f172a"; ctx.fillRect(SIDEBAR_WIDTH, 0, totalWidth - SIDEBAR_WIDTH, HEADER_HEIGHT);
-        ctx.beginPath(); ctx.moveTo(SIDEBAR_WIDTH, HEADER_HEIGHT); ctx.lineTo(totalWidth, HEADER_HEIGHT); ctx.stroke();
+        ctx.fillStyle = "#f8fafc"; // slate-50
+        ctx.fillRect(SIDEBAR_WIDTH, 0, totalWidth - SIDEBAR_WIDTH, HEADER_HEIGHT);
+        ctx.strokeStyle = "#cbd5e1"; ctx.beginPath(); ctx.moveTo(SIDEBAR_WIDTH, HEADER_HEIGHT); ctx.lineTo(totalWidth, HEADER_HEIGHT); ctx.stroke();
 
-        ctx.fillStyle = "#94a3b8"; ctx.font = "11px Arial"; ctx.textAlign = "center";
+        ctx.fillStyle = "#64748b"; ctx.font = "10px sans-serif"; ctx.textAlign = "center";
         for (let h = Math.floor(visibleStart); h <= Math.ceil(visibleEnd); h++) {
             const x = SIDEBAR_WIDTH + (h * zoom) - scrollX;
-            ctx.fillText(`${h}h`, x, 25);
-            ctx.fillRect(x, HEADER_HEIGHT - 5, 1, 5);
+            // Marker godziny
+            ctx.fillText(`${h}:00`, x, 24);
+            ctx.fillStyle = "#cbd5e1";
+            ctx.fillRect(x, HEADER_HEIGHT - 6, 1, 6);
+            ctx.fillStyle = "#64748b"; // reset text color
         }
         ctx.restore();
 
@@ -414,54 +441,116 @@ export const GanttViewer = ({ config, simulationData }) => {
     };
 
     return (
-      <div className="flex flex-col h-[82vh] bg-gray-900 shadow-card rounded-xl border border-border overflow-hidden text-white font-sans">
-            {/* TOOLBAR */}
-            <div className="h-12 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4 shadow-md shrink-0">
-                <div className="flex items-center space-x-4">
-                    <span className="text-sm font-bold text-gray-300">📊 Harmonogram</span>
-                    
-                    {/* PRZYCISKI WIDOKU */}
-                    <div className="flex bg-gray-700 rounded p-1">
-                        <button onClick={() => setViewMode('STATIONS')} className={`px-3 py-1 text-xs rounded ${viewMode==='STATIONS' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Stacje</button>
-                        <button onClick={() => setViewMode('RESOURCES')} className={`px-3 py-1 text-xs rounded ${viewMode==='RESOURCES' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Zasoby</button>
-                    </div>
+        // GŁÓWNY KONTENER - SPÓJNY Z INNYMI MODUŁAMI
+        <div className="flex h-[82vh] gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-card font-sans text-slate-900 overflow-hidden">
+            
+            {/* PANEL STEROWANIA (SIDEBAR) */}
+            <aside className="w-64 flex flex-col gap-4 bg-white rounded-xl shadow-sm border border-slate-200 p-4 shrink-0 overflow-y-auto custom-scrollbar">
+                
+                <div className="pb-4 border-b border-slate-100">
+                    <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <GanttChart size={16} className="text-blue-600"/> Harmonogram
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-1">Wizualizacja przebiegu w czasie</p>
+                </div>
 
-                    {/* NOWE: NAWIGACJA ZMIANOWA */}
-                    <div className="flex bg-gray-700 rounded p-1 space-x-1">
-                        <button onClick={() => jumpToShift('prev')} className="px-3 py-1 text-xs rounded bg-gray-600 hover:bg-gray-500 text-white">⏮ Poprz. Zmiana</button>
-                        <button onClick={() => jumpToShift('next')} className="px-3 py-1 text-xs rounded bg-gray-600 hover:bg-gray-500 text-white">Nast. Zmiana ⏭</button>
+                {/* TRYB WIDOKU */}
+                <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Tryb Wyświetlania</label>
+                    <div className="flex flex-col gap-2">
+                        <button 
+                            onClick={() => setViewMode('STATIONS')}
+                            className={`flex items-center p-2.5 rounded-lg border text-xs font-semibold transition-all ${viewMode === 'STATIONS' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                        >
+                            <Layers size={14} className="mr-2"/> Stacje Robocze
+                        </button>
+                        <button 
+                            onClick={() => setViewMode('RESOURCES')}
+                            className={`flex items-center p-2.5 rounded-lg border text-xs font-semibold transition-all ${viewMode === 'RESOURCES' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                        >
+                            <Users size={14} className="mr-2"/> Zasoby (Pule)
+                        </button>
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <button onClick={() => setZoom(z => Math.max(z * 0.8, 1))} className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600">-</button>
-                    <span className="text-xs font-mono w-12 text-center">{Math.round(zoom)} px/h</span>
-                    <button onClick={() => setZoom(z => Math.min(z * 1.2, 200))} className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600">+</button>
+                {/* NAWIGACJA ZMIAN */}
+                <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Nawigacja Zmianowa</label>
+                    <div className="flex gap-2">
+                        <button onClick={() => jumpToShift('prev')} className="flex-1 flex items-center justify-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-semibold transition-colors border border-slate-200">
+                            <ChevronLeft size={14}/> Poprz.
+                        </button>
+                        <button onClick={() => jumpToShift('next')} className="flex-1 flex items-center justify-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-semibold transition-colors border border-slate-200">
+                            Nast. <ChevronRight size={14}/>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            {/* CANVAS */}
-            <div className="flex-1 relative overflow-hidden" ref={containerRef}>
+                {/* ZOOM CONTROL */}
+                <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Skala Czasu (Zoom)</label>
+                    <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                        <button onClick={() => setZoom(z => Math.max(z * 0.8, 5))} className="p-1.5 hover:bg-white rounded shadow-sm text-slate-600 transition-all"><ZoomOut size={14}/></button>
+                        <span className="flex-1 text-center text-xs font-mono text-slate-600">{Math.round(zoom)} px/h</span>
+                        <button onClick={() => setZoom(z => Math.min(z * 1.2, 200))} className="p-1.5 hover:bg-white rounded shadow-sm text-slate-600 transition-all"><ZoomIn size={14}/></button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1 text-center italic">Shift + Scroll aby przybliżyć</p>
+                </div>
+
+                {/* LEGENDA */}
+                <div className="border-t border-slate-100 pt-4 mt-2">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Legenda</label>
+                    <div className="space-y-1.5">
+                        {LEGEND_ITEMS.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                                <span className="w-3 h-3 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: item.color }}></span>
+                                <span className="text-xs text-slate-600">{item.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+            </aside>
+
+            {/* GŁÓWNY OBSZAR CANVAS */}
+            <main className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden relative" ref={containerRef}>
                 <canvas 
                     ref={canvasRef}
                     onMouseMove={handleMouseMove}
                     onMouseLeave={() => setHoveredBlock(null)}
                     onWheel={handleWheel}
-                    className="cursor-crosshair block"
+                    className="block cursor-crosshair"
                 />
 
-                {/* TOOLTIP */}
-                {hoveredBlock && (
-                    <div className="fixed pointer-events-none z-50 bg-white text-gray-800 p-3 rounded shadow-xl border border-gray-200 text-xs" style={{ left: mousePos.x + 15, top: mousePos.y + 15 }}>
-                        <div className="font-bold text-blue-600 border-b pb-1 mb-1">{hoveredBlock.rowName}</div>
-                        <div><span className="font-semibold">Typ:</span> {hoveredBlock.status}</div>
-                        <div><span className="font-semibold">Czas:</span> {hoveredBlock.start.toFixed(2)}h - {hoveredBlock.end.toFixed(2)}h</div>
-                        <div><span className="font-semibold">Trwanie:</span> {hoveredBlock.duration.toFixed(2)}h</div>
-                        {hoveredBlock.meta?.stationId && <div><span className="font-semibold">Stacja:</span> {hoveredBlock.meta.stationId}</div>}
-                        {hoveredBlock.lane !== undefined && <div><span className="font-semibold">Wątek:</span> #{hoveredBlock.lane + 1}</div>}
+                {/* EMPTY STATE */}
+                {rows.length === 0 && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 pointer-events-none">
+                        <MonitorPlay size={48} className="opacity-20 mb-2"/>
+                        <p className="text-sm font-medium">Brak danych do wyświetlenia.</p>
+                        <p className="text-xs">Uruchom symulację, aby zobaczyć harmonogram.</p>
                     </div>
                 )}
-            </div>
+
+                {/* TOOLTIP (Przeniesiony na jasny styl) */}
+                {hoveredBlock && (
+                    <div 
+                        className="fixed pointer-events-none z-50 bg-white/95 backdrop-blur-sm text-slate-800 p-3 rounded-lg shadow-xl border border-slate-200 text-xs animate-in fade-in zoom-in-95 duration-150" 
+                        style={{ left: mousePos.x + 15, top: mousePos.y + 15, minWidth: '180px' }}
+                    >
+                        <div className="flex items-center gap-2 border-b border-slate-100 pb-2 mb-2">
+                            <MousePointer2 size={12} className="text-blue-500"/>
+                            <span className="font-bold text-slate-900">{hoveredBlock.rowName}</span>
+                        </div>
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between"><span className="text-slate-500">Typ:</span> <span className="font-semibold">{hoveredBlock.status}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500">Czas:</span> <span className="font-mono">{hoveredBlock.start.toFixed(2)}h - {hoveredBlock.end.toFixed(2)}h</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500">Trwanie:</span> <span className="font-mono font-bold text-slate-700">{hoveredBlock.duration.toFixed(2)}h</span></div>
+                            {hoveredBlock.meta?.stationId && <div className="flex justify-between"><span className="text-slate-500">Stacja:</span> <span className="font-medium text-blue-600">{hoveredBlock.meta.stationId}</span></div>}
+                            {hoveredBlock.lane !== undefined && <div className="flex justify-between"><span className="text-slate-500">Wątek:</span> <span className="font-medium">#{hoveredBlock.lane + 1}</span></div>}
+                        </div>
+                    </div>
+                )}
+            </main>
         </div>
     );
 };
