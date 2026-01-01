@@ -194,7 +194,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         for(let y=Math.floor(startY/gridSize)*gridSize; y<endY; y+=gridSize) { ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
         ctx.stroke();
 
-        // === 1. PRE-KALKULACJA UKŁADU (RESPONSYWNE BLOKI) ===
+        // === PRE-KALKULACJA UKŁADU ===
         const nodeLayouts = new Map();
         const getLayout = (id) => nodeLayouts.get(id) || { x: 0, y: 0, width: 0, height: 0 };
 
@@ -211,8 +211,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             
             const blockWidth = fixedBlockWidth;
             
-            // Obliczanie wysokości nagłówka (Wrapping)
-            const iconSpace = 30; // Miejsce na ikonę z lewej
+            const iconSpace = 30; 
             const availableTextWidth = blockWidth - iconSpace - 10;
             const textLines = getWrappedLines(ctx, node.name, availableTextWidth);
             const lineHeight = 14;
@@ -225,11 +224,8 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             const slotWidth = SLOT_WIDTH_FIXED;
 
             // PIONOWE CENTROWANIE TEKSTU W NAGŁÓWKU
-            // Obliczamy całkowitą wysokość bloku tekstu
             const textBlockHeight = textLines.length * lineHeight;
-            // Środek nagłówka
             const headerCenterY = node.y + (headerHeight / 2);
-            // Początek tekstu (Top Y) tak, aby środek bloku tekstu pokrywał się ze środkiem nagłówka
             const textStartY = headerCenterY - (textBlockHeight / 2);
 
             nodeLayouts.set(node.id, {
@@ -242,9 +238,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                 innerPadding,
                 textLines,
                 lineHeight,
-                // Tekst wyśrodkowany poziomo w dostępnej przestrzeni
                 textX: node.x + iconSpace + (availableTextWidth / 2),
-                // Tekst wyśrodkowany pionowo (użyjemy textBaseline='top')
                 textY: textStartY
             });
         });
@@ -357,14 +351,13 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             // --- RYSOWANIE TEKSTU ---
             ctx.fillStyle = "#1e293b";
             ctx.font = "bold 11px Arial";
-            ctx.textBaseline = "top"; // KLUCZOWE DLA PRECYZYJNEGO CENTROWANIA
+            ctx.textBaseline = "top"; 
             
             if (isStation) {
                 const icon = status === 'RUN' ? '⚙️' : (status === 'BLOCKED' ? '🛑' : (status === 'OFFLINE' ? '⚠️' : '💤'));
                 ctx.textAlign = "left";
                 ctx.font = "14px Arial";
-                // Ikona
-                ctx.fillText(icon, layout.x + 8, layout.y + 24 - 7); // -7 bo baseline top
+                ctx.fillText(icon, layout.x + 8, layout.y + 24 - 7); 
 
                 ctx.textAlign = "center";
                 ctx.font = "bold 11px Arial";
@@ -396,7 +389,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                 const displayCount = Math.min(bufferInfo.count, 10);
                 for(let i=0; i<displayCount; i++) { ctx.fillStyle = COLORS.PART_BODY; ctx.fillRect(layout.x + 10 + (i*8), stateY + 15, 6, 6); }
             }
-            // Reset baseline
             ctx.textBaseline = "alphabetic";
         });
 
@@ -495,7 +487,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
     
     const drawPartTile = (ctx, x, y, orderId, partCode, subCode, isAssembled, color, extra = {}) => {
         const w = extra.customWidth || 90; 
-        const h = 44; // WYSOKOŚĆ 44px
+        const h = 44; // WYSOKOŚĆ KAFELKA
         
         ctx.save(); ctx.translate(x - w/2, y - h/2);
         ctx.shadowBlur = 4; ctx.shadowColor = "rgba(0,0,0,0.1)";
@@ -505,11 +497,10 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         ctx.fillStyle = color; if (isAssembled) { ctx.beginPath(); ctx.arc(10, h/2, 4, 0, Math.PI*2); ctx.fill(); } else { ctx.fillRect(0, 0, 6, h); }
         ctx.textAlign = "left";
         
-        // TEKST PODNIESIONY WYŻEJ
         if (w > 60) {
-            ctx.font = "9px Arial"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`Zl: ${orderId}`, 10, 9); // y=9
-            ctx.font = "bold 10px Arial"; ctx.fillStyle = "#1e293b"; ctx.fillText(`${partCode}`, 10, 20); // y=20
-            ctx.font = "bold 11px Arial"; ctx.fillStyle = "#d97706"; ctx.fillText(`${subCode || '-'}`, 10, 31); // y=31
+            ctx.font = "9px Arial"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`Zl: ${orderId}`, 10, 9);
+            ctx.font = "bold 10px Arial"; ctx.fillStyle = "#1e293b"; ctx.fillText(`${partCode}`, 10, 20);
+            ctx.font = "bold 11px Arial"; ctx.fillStyle = "#d97706"; ctx.fillText(`${subCode || '-'}`, 10, 31);
         } else {
             ctx.font = "bold 10px Arial"; ctx.fillStyle = "#1e293b"; ctx.fillText(`${subCode}`, 8, 22);
         }
@@ -518,16 +509,9 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             const totalDur = extra.endTime - extra.startTime;
             const elapsed = extra.currentTime - extra.startTime;
             const pct = Math.min(1, Math.max(0, elapsed / totalDur));
-            
-            // PASEK NA SAMYM DOLE (y = h - 5)
-            const barHeight = 4; 
-            const sideMargin = 4;
-            const barY = h - barHeight - 2;
-            
-            ctx.fillStyle = "#e2e8f0"; 
-            ctx.fillRect(sideMargin, barY, w - (sideMargin*2), barHeight);
-            ctx.fillStyle = "#22c55e"; 
-            ctx.fillRect(sideMargin, barY, (w - (sideMargin*2)) * pct, barHeight);
+            const barY = h - 4 - 2; // Pasek na dole kafelka
+            ctx.fillStyle = "#e2e8f0"; ctx.fillRect(2, barY, w - 4, 2);
+            ctx.fillStyle = "#22c55e"; ctx.fillRect(2, barY, (w - 4) * pct, 2);
         }
         ctx.restore();
     };
@@ -548,22 +532,11 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         ctx.beginPath(); 
         ctx.strokeStyle = isActive ? activeColor : idleColor; 
         ctx.lineWidth = isActive ? 4 : 3;
-        
-        if (isWorker) {
-            ctx.setLineDash([5, 5]); 
-        } else if (isActive) {
-            ctx.setLineDash([6, 4]); 
-        } else {
-            ctx.setLineDash([]);
-        }
+        if (isWorker) { ctx.setLineDash([5, 5]); } else if (isActive) { ctx.setLineDash([6, 4]); } else { ctx.setLineDash([]); }
         
         ctx.moveTo(startX, startY); ctx.lineTo(midX, startY); ctx.lineTo(midX, endY); ctx.lineTo(endX, endY);
-        ctx.stroke(); 
-        ctx.setLineDash([]);
-        
-        ctx.fillStyle = ctx.strokeStyle; 
-        ctx.beginPath(); 
-        ctx.moveTo(endX, endY); ctx.lineTo(endX - 8, endY - 5); ctx.lineTo(endX - 8, endY + 5); ctx.fill();
+        ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.moveTo(endX, endY); ctx.lineTo(endX - 8, endY - 5); ctx.lineTo(endX - 8, endY + 5); ctx.fill();
     };
 
     // Handlery
@@ -698,8 +671,8 @@ export const RealTimeViewer = ({ config, simulationData }) => {
 
                 <div className="pointer-events-auto flex flex-col gap-2">
                     <div className="bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl shadow-sm p-3 flex items-center gap-4">
-                        <span className="text-xs font-mono font-bold text-slate-500 w-12 text-right">{currentTimeVal.toFixed(1)}h</span>
-                        <input type="range" min="0" max={simulationData?.duration || 100} step="0.1" value={currentTimeVal} onChange={handleTimelineChange} className="flex-1 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"/>
+                        <span className="text-xs font-mono font-bold text-slate-500 w-12 text-right">{currentTimeVal.toFixed(2)}h</span>
+                        <input type="range" min="0" max={simulationData?.duration || 100} step="0.01" value={currentTimeVal} onChange={handleTimelineChange} className="flex-1 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"/>
                         <span className="text-xs font-mono font-bold text-slate-400 w-12">{(simulationData?.duration || 100).toFixed(0)}h</span>
                         <button 
                             onClick={() => setIsBufferPanelOpen(!isBufferPanelOpen)}
