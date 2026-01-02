@@ -359,7 +359,9 @@ export class SimulationEventHandler {
         }
     }
 
+    // === ZAKTUALIZOWANA METODA: SMART ROUTING ===
     tryPushFromBuffer(bufferId) {
+        // Sprawdź czy zakład pracuje
         if (!this.engine.scheduler.isWorkingTime(this.engine.simulationTime)) return;
 
         const bufferState = this.engine.bufferStates[bufferId];
@@ -371,25 +373,45 @@ export class SimulationEventHandler {
         
         if (!nextOperation) return; 
         
-        const targetStations = this.engine.config.stations.filter(s => 
-            s.allowedOps.some(op => op.id === nextOperation.id)
+        // 1. Znajdź wszystkie stacje, które mogą wykonać tę operację
+        const capableStations = this.engine.config.stations.filter(s => 
+            s.allowedOps && s.allowedOps.some(op => op.id === nextOperation.id)
         );
         
-        if (targetStations.length === 0) return;
-        
-        const targetStation = targetStations[0]; 
-        const targetFlow = this.engine.config.flows.find(f => f.from === bufferId && f.to === targetStation.id);
-        
-        if (!targetFlow) return;
+        if (capableStations.length === 0) return;
 
-        const targetState = this.engine.stationStates[targetStation.id];
-        const capacity = targetStation.capacity || 1;
-        const INPUT_LIMIT = capacity + 2; 
+        // 2. Znajdź kandydatów: stacje połączone fizycznie z tym buforem
+        const candidates = [];
 
-        if ((targetState.queue.length + targetState.incoming) >= INPUT_LIMIT) {
-            return;
+        for (const station of capableStations) {
+            const flow = this.engine.config.flows.find(f => f.from === bufferId && f.to === station.id);
+            if (!flow) continue;
+
+            const stState = this.engine.stationStates[station.id];
+            
+            // Sprawdź limit wejścia (Pull limit)
+            const capacity = station.capacity || 1;
+            const inputLimit = capacity + 2; 
+            if ((stState.queue.length + stState.incoming) >= inputLimit) {
+                continue; // Stacja przepełniona, pomiń
+            }
+
+            // Oblicz wynik (Score). Mniejszy = Lepszy.
+            // Score = kolejka + to co już jedzie.
+            const score = stState.queue.length + stState.incoming;
+            candidates.push({ station, flow, score });
         }
+
+        // 3. Wybierz najlepszego kandydata
+        if (candidates.length === 0) return;
+
+        // Sortowanie rosnąco po score (najmniej obciążona stacja pierwsza)
+        candidates.sort((a, b) => a.score - b.score);
         
+        const bestTarget = candidates[0];
+        const targetStation = bestTarget.station;
+        
+        // Wykonaj przesunięcie
         bufferState.queue.shift();
         this.engine.recordBufferState(bufferId, bufferState.queue);
 

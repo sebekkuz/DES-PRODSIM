@@ -11,7 +11,9 @@ import {
     ZoomIn,
     ZoomOut,
     PanelBottomOpen,
-    PanelBottomClose
+    PanelBottomClose,
+    Hourglass,
+    Cog
 } from 'lucide-react';
 
 export const RealTimeViewer = ({ config, simulationData }) => {
@@ -96,6 +98,34 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             workerTravelEvents: wEvents
         };
     }, [simulationData, config]);
+
+    // === NOWE: Analiza interwałów pracy dla zleceń (Pre-processing) ===
+    const orderWorkData = useMemo(() => {
+        if (!simulationData || !simulationData.replayEvents) return { intervals: {}, totals: {} };
+
+        const intervals = {}; // orderId -> [{start, end, duration}]
+        const totals = {};    // orderId -> totalDuration
+
+        simulationData.replayEvents.forEach(e => {
+            if (e.type === 'STATION_STATE' && e.status === 'RUN' && e.meta && e.meta.order) {
+                const orderId = e.meta.order;
+                if (!intervals[orderId]) intervals[orderId] = [];
+                if (!totals[orderId]) totals[orderId] = 0;
+
+                const duration = e.meta.duration || (e.meta.endTime - e.meta.startTime);
+                
+                intervals[orderId].push({
+                    start: e.meta.startTime,
+                    end: e.meta.endTime,
+                    duration: duration
+                });
+                totals[orderId] += duration;
+            }
+        });
+
+        return { intervals, totals };
+    }, [simulationData]);
+
 
     // === 2. LOGIKA CZASU ===
     const getShiftInfo = (timeHours) => {
@@ -223,7 +253,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             const innerPadding = STATION_PADDING;
             const slotWidth = SLOT_WIDTH_FIXED;
 
-            // PIONOWE CENTROWANIE TEKSTU W NAGŁÓWKU
             const textBlockHeight = textLines.length * lineHeight;
             const headerCenterY = node.y + (headerHeight / 2);
             const textStartY = headerCenterY - (textBlockHeight / 2);
@@ -262,7 +291,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             if(from.width && to.width) drawFlowConnection(ctx, from, to, false, COLORS.ARROW_ACTIVE, COLORS.ARROW_IDLE);
         });
 
-        // POŁĄCZENIA ZASOBÓW
         if (config.workerFlows) {
             config.workerFlows.forEach(wf => {
                 const from = getLayout(wf.from); 
@@ -398,7 +426,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             });
         });
 
-        // TRANSPORT
         transportEvents.forEach(evt => {
             if (currentTimeVal >= evt.startTime && currentTimeVal <= evt.endTime) {
                 const fromLayout = getLayout(evt.from); const toLayout = getLayout(evt.to);
@@ -417,7 +444,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             }
         });
 
-        // PRACOWNICY
         workerTravelEvents.forEach(evt => {
             if (currentTimeVal >= evt.startTime && currentTimeVal <= evt.endTime) {
                 const fromLayout = getLayout(evt.from); const toLayout = getLayout(evt.to);
@@ -467,27 +493,66 @@ export const RealTimeViewer = ({ config, simulationData }) => {
     }, [config, simulationData, currentTimeVal, viewState, stationTimelines, bufferTimelines, transportEvents, workerTravelEvents]); 
 
 
-    // === 4. HELPERY ===
+    // === 4. SIDEBARY & UPDATE (LOGIKA POSTĘPU PRACY) ===
     const updateSidebars = () => {
         if (!simulationData?.orderReports) return;
         const info = getShiftInfo(currentTimeVal);
         setCurrentShiftInfo(info);
-        const active = []; const finished = [];
-        simulationData.orderReports.forEach((o) => {
-            if (currentTimeVal >= o.endTime) finished.push(o);
-            else if (currentTimeVal >= o.startTime) {
-                const duration = o.endTime - o.startTime;
-                const pct = duration > 0 ? Math.min(100, Math.max(0, Math.round(((currentTimeVal - o.startTime) / duration) * 100))) : 0;
-                active.push({ ...o, pct, renderedCode: o.code });
+
+        // 1. Zidentyfikuj zlecenia FIZYCZNIE przetwarzane w tym momencie (do flagi isProcessing)
+        const currentlyProcessingOrderIds = new Set();
+        config.stations.forEach(s => {
+            const timeline = stationTimelines[s.id];
+            if (timeline) {
+                const activeOps = timeline.filter(e => e.status === 'RUN' && e.meta && e.meta.startTime <= currentTimeVal && e.meta.endTime > currentTimeVal);
+                activeOps.forEach(op => { if (op.meta.order) currentlyProcessingOrderIds.add(op.meta.order); });
             }
         });
+
+        const active = [];
+        const finished = [];
+
+        simulationData.orderReports.forEach((o) => {
+            if (currentTimeVal >= o.endTime) {
+                finished.push(o);
+            } else if (currentTimeVal >= o.startTime) {
+                
+                // === NOWA LOGIKA PCT: BAZUJĄCA NA WYKONANEJ PRACY ===
+                const orderIntervals = orderWorkData.intervals[o.id] || [];
+                const totalWorkRequired = orderWorkData.totals[o.id] || 1; // Unikamy dzielenia przez 0
+                
+                let completedWork = 0;
+                orderIntervals.forEach(interval => {
+                    if (currentTimeVal >= interval.end) {
+                        // Praca zakończona w całości
+                        completedWork += interval.duration;
+                    } else if (currentTimeVal > interval.start) {
+                        // Praca w toku - dodaj część
+                        completedWork += (currentTimeVal - interval.start);
+                    }
+                    // Jeśli start > currentTimeVal, praca jeszcze się nie zaczęła, więc 0
+                });
+
+                const pct = Math.min(100, Math.max(0, (completedWork / totalWorkRequired) * 100));
+                
+                const isProcessing = currentlyProcessingOrderIds.has(o.id);
+                
+                active.push({ 
+                    ...o, 
+                    pct, 
+                    renderedCode: o.code,
+                    isProcessing: isProcessing 
+                });
+            }
+        });
+        
         setActiveOrders(active);
         setFinishedOrders(finished);
     };
     
     const drawPartTile = (ctx, x, y, orderId, partCode, subCode, isAssembled, color, extra = {}) => {
         const w = extra.customWidth || 90; 
-        const h = 44; // WYSOKOŚĆ KAFELKA
+        const h = 44; 
         
         ctx.save(); ctx.translate(x - w/2, y - h/2);
         ctx.shadowBlur = 4; ctx.shadowColor = "rgba(0,0,0,0.1)";
@@ -509,7 +574,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             const totalDur = extra.endTime - extra.startTime;
             const elapsed = extra.currentTime - extra.startTime;
             const pct = Math.min(1, Math.max(0, elapsed / totalDur));
-            const barY = h - 4 - 2; // Pasek na dole kafelka
+            const barY = h - 4 - 2; 
             ctx.fillStyle = "#e2e8f0"; ctx.fillRect(2, barY, w - 4, 2);
             ctx.fillStyle = "#22c55e"; ctx.fillRect(2, barY, (w - 4) * pct, 2);
         }
@@ -539,14 +604,12 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.moveTo(endX, endY); ctx.lineTo(endX - 8, endY - 5); ctx.lineTo(endX - 8, endY + 5); ctx.fill();
     };
 
-    // Handlery
     const handleMouseDown = (e) => { setIsDragging(true); setLastMousePos({ x: e.clientX, y: e.clientY }); };
     const handleMouseMove = (e) => { if (!isDragging) return; const dx = e.clientX - lastMousePos.x; const dy = e.clientY - lastMousePos.y; setViewState(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy })); setLastMousePos({ x: e.clientX, y: e.clientY }); };
     const handleMouseUp = () => setIsDragging(false);
     const handleWheel = (e) => { const scale = e.deltaY > 0 ? 0.9 : 1.1; setViewState(prev => ({ ...prev, zoom: Math.min(Math.max(0.5, prev.zoom * scale), 3) })); };
     const handleTimelineChange = (e) => { setCurrentTimeVal(parseFloat(e.target.value)); setIsPlaying(false); };
 
-    // === TABELA BUFORÓW ===
     const BufferTable = () => {
         const bufferIds = Object.keys(bufferTableData);
         if (bufferIds.length === 0) return <div className="p-4 text-center text-slate-400 text-xs">Brak danych buforów</div>;
@@ -633,13 +696,22 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                             </div>
                             <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
                                 {activeOrders.map((order, i) => (
-                                    <div key={i} className="bg-white rounded-lg border border-slate-100 p-2.5 shadow-sm">
+                                    <div key={i} className={`bg-white rounded-lg border p-2.5 shadow-sm transition-all ${order.isProcessing ? 'border-blue-300 ring-1 ring-blue-100' : 'border-slate-100'}`}>
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-xs font-bold text-slate-700">Zl: {order.id.replace(/\.$/, '')}</span>
-                                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 rounded">{order.size}</span>
+                                            <div className="flex items-center gap-1">
+                                                {order.isProcessing ? 
+                                                    <Cog size={12} className="text-blue-500 animate-spin-slow"/> : 
+                                                    <Hourglass size={12} className="text-amber-400"/>
+                                                }
+                                                <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 rounded">{order.size}</span>
+                                            </div>
                                         </div>
                                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                            <div className="bg-blue-500 h-full rounded-full transition-all duration-300" style={{width: `${order.pct}%`}}></div>
+                                            <div className={`h-full rounded-full transition-all duration-300 ${order.isProcessing ? 'bg-blue-500' : 'bg-amber-400'}`} style={{width: `${order.pct}%`}}></div>
+                                        </div>
+                                        <div className="text-[9px] text-right mt-1 font-medium text-slate-400">
+                                            {order.isProcessing ? 'W toku' : 'Oczekiwanie'}
                                         </div>
                                     </div>
                                 ))}
