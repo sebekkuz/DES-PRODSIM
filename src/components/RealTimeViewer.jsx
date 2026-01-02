@@ -27,11 +27,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
 
-    const [currentShiftInfo, setCurrentShiftInfo] = useState({ day: 0, hour: 0, shift: '-', isWorking: true });
-    const [activeOrders, setActiveOrders] = useState([]); 
-    const [finishedOrders, setFinishedOrders] = useState([]);
-    const [bufferTableData, setBufferTableData] = useState({}); 
-    
     const canvasRef = useRef(null);
     const animationFrameRef = useRef();
     const lastTimestampRef = useRef(0);
@@ -64,14 +59,10 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         WORKER_ARROW: '#60a5fa' 
     };
 
-    const getStationWidth = (capacity = 1) => {
-        return (capacity * SLOT_WIDTH_FIXED) + (STATION_PADDING * 2);
-    };
-
-    // === 1. PRZYGOTOWANIE DANYCH ===
+    // === 1. PRZYGOTOWANIE DANYCH (MEMO) ===
     const { stationTimelines, bufferTimelines, transportEvents, workerTravelEvents } = useMemo(() => {
         if (!simulationData || !simulationData.replayEvents) 
-            return { stationTimelines: {}, bufferTimelines: {}, transportEvents: [], workerTravelEvents: [], ordersMap: {} };
+            return { stationTimelines: {}, bufferTimelines: {}, transportEvents: [], workerTravelEvents: [] };
         
         const events = simulationData.replayEvents.sort((a, b) => a.time - b.time);
         
@@ -91,7 +82,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         const wEvents = events.filter(e => e.type === 'WORKER_TRAVEL');
 
         return { 
-            replayEvents: events,
             stationTimelines: sTimelines,
             bufferTimelines: bTimelines,
             transportEvents: tEvents,
@@ -99,38 +89,30 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         };
     }, [simulationData, config]);
 
-    // === NOWE: Analiza interwałów pracy dla zleceń (Pre-processing) ===
+    // === 2. DANE STATYCZNE O PRACY (MEMO) ===
     const orderWorkData = useMemo(() => {
         if (!simulationData || !simulationData.replayEvents) return { intervals: {}, totals: {} };
-
-        const intervals = {}; // orderId -> [{start, end, duration}]
-        const totals = {};    // orderId -> totalDuration
-
+        const intervals = {}; 
+        const totals = {};    
         simulationData.replayEvents.forEach(e => {
             if (e.type === 'STATION_STATE' && e.status === 'RUN' && e.meta && e.meta.order) {
                 const orderId = e.meta.order;
                 if (!intervals[orderId]) intervals[orderId] = [];
                 if (!totals[orderId]) totals[orderId] = 0;
-
                 const duration = e.meta.duration || (e.meta.endTime - e.meta.startTime);
-                
-                intervals[orderId].push({
-                    start: e.meta.startTime,
-                    end: e.meta.endTime,
-                    duration: duration
-                });
+                intervals[orderId].push({ start: e.meta.startTime, end: e.meta.endTime, duration: duration });
                 totals[orderId] += duration;
             }
         });
-
         return { intervals, totals };
     }, [simulationData]);
 
-
-    // === 2. LOGIKA CZASU ===
-    const getShiftInfo = (timeHours) => {
+    // === 3. OBLICZENIA DYNAMICZNE (DERIVED STATE) ===
+    
+    // A. Informacje o zmianie
+    const currentShiftInfo = useMemo(() => {
         if (!simulationData?.shiftSettings) return { day: 1, hour: 0, shift: 'Domyślna', isWorking: true, dateStr: '' };
-        const totalHours = timeHours;
+        const totalHours = currentTimeVal;
         const dayIndex = Math.floor(totalHours / 24);
         const hourOfDay = totalHours % 24;
         const date = new Date(2025, 0, 1);
@@ -153,25 +135,90 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             if (inShift) { activeShiftName = `Zmiana ${key}`; isWorking = true; }
         });
         return { day: dayIndex + 1, hour: hourOfDay, shift: activeShiftName, isWorking, dateStr };
-    };
+    }, [currentTimeVal, simulationData]);
 
+    // B. Zlecenia Aktywne i Zakończone
+    const { activeOrders, finishedOrders } = useMemo(() => {
+        if (!simulationData?.orderReports) return { activeOrders: [], finishedOrders: [] };
+        
+        const active = [];
+        const finished = [];
+        
+        const currentlyProcessingOrderIds = new Set();
+        config.stations.forEach(s => {
+            const timeline = stationTimelines[s.id];
+            if (timeline) {
+                const activeOps = timeline.filter(e => e.status === 'RUN' && e.meta && e.meta.startTime <= currentTimeVal && e.meta.endTime > currentTimeVal);
+                activeOps.forEach(op => { if (op.meta.order) currentlyProcessingOrderIds.add(op.meta.order); });
+            }
+        });
+
+        simulationData.orderReports.forEach((o) => {
+            if (currentTimeVal >= o.endTime) {
+                finished.push(o);
+            } else if (currentTimeVal >= o.startTime) {
+                const orderIntervals = orderWorkData.intervals[o.id] || [];
+                const totalWorkRequired = orderWorkData.totals[o.id] || 1;
+                let completedWork = 0;
+                orderIntervals.forEach(interval => {
+                    if (currentTimeVal >= interval.end) completedWork += interval.duration;
+                    else if (currentTimeVal > interval.start) completedWork += (currentTimeVal - interval.start);
+                });
+                const pct = Math.min(100, Math.max(0, (completedWork / totalWorkRequired) * 100));
+                
+                active.push({ 
+                    ...o, 
+                    pct, 
+                    renderedCode: o.code,
+                    isProcessing: currentlyProcessingOrderIds.has(o.id) 
+                });
+            }
+        });
+        return { activeOrders: active, finishedOrders: finished };
+    }, [currentTimeVal, simulationData, orderWorkData, stationTimelines, config]);
+
+    // C. Dane tabeli buforów
+    const bufferTableData = useMemo(() => {
+        const update = {};
+        config.buffers.forEach(b => {
+            const timeline = bufferTimelines[b.id];
+            let count = 0; let content = [];
+            if (timeline && timeline.length > 0) {
+                for (let i = timeline.length - 1; i >= 0; i--) {
+                    if (timeline[i].time <= currentTimeVal) { 
+                        count = timeline[i].count; 
+                        content = timeline[i].content; 
+                        break; 
+                    }
+                }
+            }
+            update[b.id] = { name: b.name, count, content };
+        });
+        return update;
+    }, [currentTimeVal, bufferTimelines, config]);
+
+    // === NAPRAWIONE: Brakująca funkcja jumpToNextDay ===
     const jumpToNextDay = () => {
         const nextDayStart = (Math.floor(currentTimeVal / 24) + 1) * 24 + 6;
-        setCurrentTimeVal(Math.min(nextDayStart, simulationData.duration));
+        setCurrentTimeVal(Math.min(nextDayStart, simulationData?.duration || 100));
     };
 
+    // === 4. PĘTLA ANIMACJI ===
     useEffect(() => {
         if (!isPlaying) { cancelAnimationFrame(animationFrameRef.current); return; }
+        
         const animate = (timestamp) => {
             if (!lastTimestampRef.current) lastTimestampRef.current = timestamp;
             const delta = timestamp - lastTimestampRef.current;
-            const hourStep = (delta / 1000) * (playbackSpeed / 3600); 
-            setCurrentTimeVal(prev => {
-                const next = prev + hourStep;
-                if (next >= (simulationData?.duration || 100)) { setIsPlaying(false); return simulationData?.duration || 100; }
-                return next;
-            });
-            lastTimestampRef.current = timestamp;
+            if (delta > 16) { 
+                const hourStep = (delta / 1000) * (playbackSpeed / 3600); 
+                setCurrentTimeVal(prev => {
+                    const next = prev + hourStep;
+                    if (next >= (simulationData?.duration || 100)) { setIsPlaying(false); return simulationData?.duration || 100; }
+                    return next;
+                });
+                lastTimestampRef.current = timestamp;
+            }
             animationFrameRef.current = requestAnimationFrame(animate);
         };
         animationFrameRef.current = requestAnimationFrame(animate);
@@ -193,7 +240,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         return lines;
     };
 
-    // === 3. RENDEROWANIE KANWY ===
+    // === 5. RENDEROWANIE KANWY ===
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas || !config || !simulationData) return;
@@ -228,31 +275,19 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         const nodeLayouts = new Map();
         const getLayout = (id) => nodeLayouts.get(id) || { x: 0, y: 0, width: 0, height: 0 };
 
-        // 1a. Stacje i Bufory
         [...config.stations, ...config.buffers].forEach(node => {
             const isStation = !!node.type;
             const capacity = node.capacity || 1;
-            
             ctx.font = "bold 11px Arial";
-            
-            const fixedBlockWidth = isStation 
-                ? (capacity * SLOT_WIDTH_FIXED) + (STATION_PADDING * 2) 
-                : 130; 
-            
+            const fixedBlockWidth = isStation ? (capacity * SLOT_WIDTH_FIXED) + (STATION_PADDING * 2) : 130; 
             const blockWidth = fixedBlockWidth;
-            
             const iconSpace = 30; 
             const availableTextWidth = blockWidth - iconSpace - 10;
             const textLines = getWrappedLines(ctx, node.name, availableTextWidth);
             const lineHeight = 14;
-            
             const headerHeight = Math.max(35, (textLines.length * lineHeight) + 20); 
-            
             const slotAreaHeight = isStation ? 60 : 40; 
             const blockHeight = headerHeight + slotAreaHeight;
-            const innerPadding = STATION_PADDING;
-            const slotWidth = SLOT_WIDTH_FIXED;
-
             const textBlockHeight = textLines.length * lineHeight;
             const headerCenterY = node.y + (headerHeight / 2);
             const textStartY = headerCenterY - (textBlockHeight / 2);
@@ -263,8 +298,8 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                 width: blockWidth,
                 height: blockHeight,
                 headerHeight,
-                slotWidth,
-                innerPadding,
+                slotWidth: SLOT_WIDTH_FIXED,
+                innerPadding: STATION_PADDING,
                 textLines,
                 lineHeight,
                 textX: node.x + iconSpace + (availableTextWidth / 2),
@@ -272,19 +307,10 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             });
         });
 
-        // 1b. ZASOBY (PRACOWNICY)
         [...config.workerPools, ...(config.toolPools || [])].forEach(node => {
-            nodeLayouts.set(node.id, {
-                x: node.x,
-                y: node.y,
-                width: 60,
-                height: 60,
-                textX: node.x + 30, 
-                textY: node.y + 70 
-            });
+            nodeLayouts.set(node.id, { x: node.x, y: node.y, width: 60, height: 60 });
         });
 
-        // POŁĄCZENIA
         config.flows.forEach(flow => {
             const from = getLayout(flow.from);
             const to = getLayout(flow.to);
@@ -295,16 +321,16 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             config.workerFlows.forEach(wf => {
                 const from = getLayout(wf.from); 
                 const to = getLayout(wf.to);     
-                if (from.width && to.width) {
-                    drawFlowConnection(ctx, from, to, false, COLORS.WORKER_ARROW, COLORS.WORKER_ARROW, true);
-                }
+                if (from.width && to.width) drawFlowConnection(ctx, from, to, false, COLORS.WORKER_ARROW, COLORS.WORKER_ARROW, true);
             });
         }
         
-        // --- LOGIKA STANU ---
         const currentStationStatus = {};
         const partsInProcess = []; 
         const currentBufferStatus = {};
+        Object.keys(bufferTableData).forEach(id => {
+            currentBufferStatus[id] = bufferTableData[id];
+        });
         
         config.stations.forEach(s => {
             const layout = getLayout(s.id);
@@ -317,7 +343,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                 const slotIdx = op.meta.slotIndex !== undefined ? op.meta.slotIndex : activeOps.indexOf(op);
                 const slotX = layout.x + layout.innerPadding + (slotIdx * layout.slotWidth);
                 const slotY = layout.y + layout.headerHeight; 
-                
                 partsInProcess.push({
                     orderId: op.meta.order || "?",
                     partCode: op.meta.part || "?",
@@ -325,39 +350,22 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                     isAssembled: op.meta.isAssembled,
                     x: slotX + layout.slotWidth/2, 
                     y: slotY + 25, 
-                    state: 'PROCESSING',
                     startTime: op.meta.startTime,
                     endTime: op.meta.endTime,
                     totalOps: op.meta.totalOps,
-                    currentOp: op.meta.currentOp,
                     width: layout.slotWidth - (PART_MARGIN * 2) 
                 });
             });
         });
 
-        const bufferTableUpdate = {};
-        config.buffers.forEach(b => {
-            const timeline = bufferTimelines[b.id];
-            let count = 0; let content = [];
-            if (timeline && timeline.length > 0) {
-                for (let i = timeline.length - 1; i >= 0; i--) {
-                    if (timeline[i].time <= currentTimeVal) { count = timeline[i].count; content = timeline[i].content; break; }
-                }
-            }
-            currentBufferStatus[b.id] = { count, content };
-            bufferTableUpdate[b.id] = { name: b.name, count, content };
-        });
-        setBufferTableData(bufferTableUpdate);
-
-        // --- RYSOWANIE OBIEKTÓW ---
         [...config.stations, ...config.buffers].forEach(node => {
             const isStation = !!node.type;
             const layout = getLayout(node.id);
             const status = isStation ? (currentStationStatus[node.id] || 'OFFLINE') : 'IDLE';
             let color = COLORS[status] || COLORS.OFFLINE;
-            let bufferInfo = isStation ? null : currentBufferStatus[node.id];
             
             if (!isStation) {
+                const bufferInfo = currentBufferStatus[node.id] || { count: 0 };
                 const fillRatio = bufferInfo.count / node.capacity;
                 if (fillRatio > 0.8) color = COLORS.BLOCKED;
                 else if (fillRatio > 0) color = COLORS.IDLE;
@@ -376,7 +384,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
             ctx.strokeRect(layout.x, layout.y, layout.width, layout.height);
             ctx.shadowBlur = 0;
             
-            // --- RYSOWANIE TEKSTU ---
             ctx.fillStyle = "#1e293b";
             ctx.font = "bold 11px Arial";
             ctx.textBaseline = "top"; 
@@ -394,23 +401,18 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                 });
 
                 const cap = node.capacity || 1;
-                ctx.strokeStyle = "#e2e8f0"; 
-                ctx.lineWidth = 1;
-                
+                ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1;
                 for(let i=0; i<cap; i++) {
                     const sx = layout.x + layout.innerPadding + (i * layout.slotWidth);
                     const sy = layout.y + layout.headerHeight;
-                    const sh = 50; 
-                    ctx.strokeRect(sx, sy, layout.slotWidth - 4, sh);
+                    ctx.strokeRect(sx, sy, layout.slotWidth - 4, 50);
                     ctx.fillStyle = "#94a3b8"; ctx.font = "9px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-                    ctx.fillText(`#${i+1}`, sx + layout.slotWidth/2, sy + sh - 5);
+                    ctx.fillText(`#${i+1}`, sx + layout.slotWidth/2, sy + 50 - 5);
                 }
-
             } else {
                 ctx.textAlign = "center";
-                layout.textLines.forEach((line, i) => {
-                    ctx.fillText(line, layout.x + layout.width/2, layout.textY + (i * layout.lineHeight));
-                });
+                layout.textLines.forEach((line, i) => { ctx.fillText(line, layout.x + layout.width/2, layout.textY + (i * layout.lineHeight)); });
+                const bufferInfo = currentBufferStatus[node.id] || { count: 0 };
                 ctx.font = "12px Arial"; ctx.fillStyle = "#64748b"; ctx.textBaseline = "alphabetic";
                 const stateY = layout.y + layout.headerHeight + 5;
                 ctx.fillText(`Stan: ${bufferInfo.count} / ${node.capacity}`, layout.x + layout.width/2, stateY + 10);
@@ -422,7 +424,7 @@ export const RealTimeViewer = ({ config, simulationData }) => {
 
         partsInProcess.forEach(part => {
             drawPartTile(ctx, part.x, part.y, part.orderId, part.partCode, part.subCode, part.isAssembled, COLORS.PART_BODY, {
-                showProgress: true, startTime: part.startTime, endTime: part.endTime, currentTime: currentTimeVal, totalOps: part.totalOps, currentOp: part.currentOp, customWidth: part.width
+                showProgress: true, startTime: part.startTime, endTime: part.endTime, currentTime: currentTimeVal, totalOps: part.totalOps, customWidth: part.width
             });
         });
 
@@ -449,21 +451,18 @@ export const RealTimeViewer = ({ config, simulationData }) => {
                 const fromLayout = getLayout(evt.from); const toLayout = getLayout(evt.to);
                 if (fromLayout.width && toLayout.width) {
                     const duration = evt.endTime - evt.startTime;
-                    if (duration > 0) {
-                        const progress = (currentTimeVal - evt.startTime) / duration;
-                        const startX = fromLayout.x + fromLayout.width/2; const startY = fromLayout.y + 40;
-                        const endX = toLayout.x + toLayout.width/2; const endY = toLayout.y + 40;
-                        const currentX = startX + (endX - startX) * progress;
-                        const currentY = startY + (endY - startY) * progress;
-                        ctx.save(); ctx.beginPath(); ctx.strokeStyle = COLORS.WORKER_PATH; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-                        ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke(); ctx.restore();
-                        drawWorkerCircle(ctx, currentX, currentY, COLORS.WORKER);
-                    }
+                    const progress = (currentTimeVal - evt.startTime) / duration;
+                    const startX = fromLayout.x + fromLayout.width/2; const startY = fromLayout.y + 40;
+                    const endX = toLayout.x + toLayout.width/2; const endY = toLayout.y + 40;
+                    const currentX = startX + (endX - startX) * progress;
+                    const currentY = startY + (endY - startY) * progress;
+                    ctx.save(); ctx.beginPath(); ctx.strokeStyle = COLORS.WORKER_PATH; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                    ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke(); ctx.restore();
+                    drawWorkerCircle(ctx, currentX, currentY, COLORS.WORKER);
                 }
             }
         });
 
-        // PRACOWNICY NA STACJACH
         const workersAtStations = {};
         config.stations.forEach(s => {
              if (currentStationStatus[s.id] === 'RUN') {
@@ -488,72 +487,13 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         });
         
         ctx.restore();
-        updateSidebars();
 
-    }, [config, simulationData, currentTimeVal, viewState, stationTimelines, bufferTimelines, transportEvents, workerTravelEvents]); 
+    }, [config, simulationData, currentTimeVal, viewState, stationTimelines, bufferTimelines, transportEvents, workerTravelEvents, bufferTableData]); 
 
-
-    // === 4. SIDEBARY & UPDATE (LOGIKA POSTĘPU PRACY) ===
-    const updateSidebars = () => {
-        if (!simulationData?.orderReports) return;
-        const info = getShiftInfo(currentTimeVal);
-        setCurrentShiftInfo(info);
-
-        // 1. Zidentyfikuj zlecenia FIZYCZNIE przetwarzane w tym momencie (do flagi isProcessing)
-        const currentlyProcessingOrderIds = new Set();
-        config.stations.forEach(s => {
-            const timeline = stationTimelines[s.id];
-            if (timeline) {
-                const activeOps = timeline.filter(e => e.status === 'RUN' && e.meta && e.meta.startTime <= currentTimeVal && e.meta.endTime > currentTimeVal);
-                activeOps.forEach(op => { if (op.meta.order) currentlyProcessingOrderIds.add(op.meta.order); });
-            }
-        });
-
-        const active = [];
-        const finished = [];
-
-        simulationData.orderReports.forEach((o) => {
-            if (currentTimeVal >= o.endTime) {
-                finished.push(o);
-            } else if (currentTimeVal >= o.startTime) {
-                
-                // === NOWA LOGIKA PCT: BAZUJĄCA NA WYKONANEJ PRACY ===
-                const orderIntervals = orderWorkData.intervals[o.id] || [];
-                const totalWorkRequired = orderWorkData.totals[o.id] || 1; // Unikamy dzielenia przez 0
-                
-                let completedWork = 0;
-                orderIntervals.forEach(interval => {
-                    if (currentTimeVal >= interval.end) {
-                        // Praca zakończona w całości
-                        completedWork += interval.duration;
-                    } else if (currentTimeVal > interval.start) {
-                        // Praca w toku - dodaj część
-                        completedWork += (currentTimeVal - interval.start);
-                    }
-                    // Jeśli start > currentTimeVal, praca jeszcze się nie zaczęła, więc 0
-                });
-
-                const pct = Math.min(100, Math.max(0, (completedWork / totalWorkRequired) * 100));
-                
-                const isProcessing = currentlyProcessingOrderIds.has(o.id);
-                
-                active.push({ 
-                    ...o, 
-                    pct, 
-                    renderedCode: o.code,
-                    isProcessing: isProcessing 
-                });
-            }
-        });
-        
-        setActiveOrders(active);
-        setFinishedOrders(finished);
-    };
-    
+    // === HELPERY RYSOWANIA ===
     const drawPartTile = (ctx, x, y, orderId, partCode, subCode, isAssembled, color, extra = {}) => {
         const w = extra.customWidth || 90; 
         const h = 44; 
-        
         ctx.save(); ctx.translate(x - w/2, y - h/2);
         ctx.shadowBlur = 4; ctx.shadowColor = "rgba(0,0,0,0.1)";
         ctx.fillStyle = "#ffffff";
@@ -561,7 +501,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         ctx.lineWidth = 1; ctx.strokeStyle = color; ctx.stroke();
         ctx.fillStyle = color; if (isAssembled) { ctx.beginPath(); ctx.arc(10, h/2, 4, 0, Math.PI*2); ctx.fill(); } else { ctx.fillRect(0, 0, 6, h); }
         ctx.textAlign = "left";
-        
         if (w > 60) {
             ctx.font = "9px Arial"; ctx.fillStyle = "#94a3b8"; ctx.fillText(`Zl: ${orderId}`, 10, 9);
             ctx.font = "bold 10px Arial"; ctx.fillStyle = "#1e293b"; ctx.fillText(`${partCode}`, 10, 20);
@@ -569,7 +508,6 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         } else {
             ctx.font = "bold 10px Arial"; ctx.fillStyle = "#1e293b"; ctx.fillText(`${subCode}`, 8, 22);
         }
-        
         if (extra.showProgress && extra.totalOps) {
             const totalDur = extra.endTime - extra.startTime;
             const elapsed = extra.currentTime - extra.startTime;
@@ -593,12 +531,10 @@ export const RealTimeViewer = ({ config, simulationData }) => {
         const endX = to.x;
         const endY = to.y + 40;
         const midX = startX + (endX - startX) / 2;
-
         ctx.beginPath(); 
         ctx.strokeStyle = isActive ? activeColor : idleColor; 
         ctx.lineWidth = isActive ? 4 : 3;
         if (isWorker) { ctx.setLineDash([5, 5]); } else if (isActive) { ctx.setLineDash([6, 4]); } else { ctx.setLineDash([]); }
-        
         ctx.moveTo(startX, startY); ctx.lineTo(midX, startY); ctx.lineTo(midX, endY); ctx.lineTo(endX, endY);
         ctx.stroke(); ctx.setLineDash([]);
         ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.moveTo(endX, endY); ctx.lineTo(endX - 8, endY - 5); ctx.lineTo(endX - 8, endY + 5); ctx.fill();
