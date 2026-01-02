@@ -157,14 +157,12 @@ export class SimulationEventHandler {
          }
 
          let actualTime = baseTime;
-         // Wariancja
          if (stationNode.variance && stationNode.variance > 0) {
              const variancePercent = stationNode.variance / 100;
              const randomFactor = 1 + (Math.random() * 2 - 1) * variancePercent;
              actualTime = baseTime * randomFactor;
          }
 
-         // Awarie
          if (stationNode.failureProb && stationNode.failureProb > 0) {
              const isFailure = Math.random() * 100 < stationNode.failureProb;
              if (isFailure) {
@@ -176,7 +174,6 @@ export class SimulationEventHandler {
              }
          }
 
-         // Obliczenie końca z uwzględnieniem zmian (Scheduler)
          const completionTime = this.engine.scheduler.calculateCompletionTime(this.engine.simulationTime, actualTime);
          const actualDuration = completionTime - this.engine.simulationTime;
 
@@ -223,7 +220,6 @@ export class SimulationEventHandler {
              }
          }
          
-         // Kontrola Jakości (Scrap)
          if (stationNode.type === 'jakosci') {
              const baseScrapRate = 0.01; 
              const machineFactor = (stationNode.failureProb || 0) / 1000;
@@ -241,6 +237,8 @@ export class SimulationEventHandler {
          if (nextOp) {
              if (stationNode.allowedOps && stationNode.allowedOps.length > 0) {
                  canDoNext = stationNode.allowedOps.some(op => op.id === nextOp.id);
+             } else if (!stationNode.allowedOps || stationNode.allowedOps.length === 0) {
+                 canDoNext = true;
              }
          }
 
@@ -288,8 +286,6 @@ export class SimulationEventHandler {
             }
         }
     }
-
-    // === METODY LOGICZNE (Helpers) ===
 
     notifyUpstreamBuffers(stationId) {
         const feedingFlows = this.engine.config.flows.filter(f => f.to === stationId);
@@ -359,63 +355,76 @@ export class SimulationEventHandler {
         }
     }
 
-    // === ZAKTUALIZOWANA METODA: SMART ROUTING ===
+    // === SMART ROUTING Z PĘTLĄ WHILE ===
     tryPushFromBuffer(bufferId) {
-        // Sprawdź czy zakład pracuje
         if (!this.engine.scheduler.isWorkingTime(this.engine.simulationTime)) return;
 
         const bufferState = this.engine.bufferStates[bufferId];
-        if (bufferState.queue.length === 0) return;
         
-        const partId = bufferState.queue[0];
-        const part = this.engine.parts[partId];
-        const nextOperation = part.getNextOperation();
-        
-        if (!nextOperation) return; 
-        
-        // 1. Znajdź wszystkie stacje, które mogą wykonać tę operację
-        const capableStations = this.engine.config.stations.filter(s => 
-            s.allowedOps && s.allowedOps.some(op => op.id === nextOperation.id)
-        );
-        
-        if (capableStations.length === 0) return;
-
-        // 2. Znajdź kandydatów: stacje połączone fizycznie z tym buforem
-        const candidates = [];
-
-        for (const station of capableStations) {
-            const flow = this.engine.config.flows.find(f => f.from === bufferId && f.to === station.id);
-            if (!flow) continue;
-
-            const stState = this.engine.stationStates[station.id];
+        // Pętla: próbuj wysyłać tak długo, jak są detale i wolne miejsca gdzieś dalej
+        while (bufferState.queue.length > 0) {
+            const partId = bufferState.queue[0];
+            const part = this.engine.parts[partId];
+            const nextOperation = part.getNextOperation();
             
-            // Sprawdź limit wejścia (Pull limit)
-            const capacity = station.capacity || 1;
-            const inputLimit = capacity + 2; 
-            if ((stState.queue.length + stState.incoming) >= inputLimit) {
-                continue; // Stacja przepełniona, pomiń
+            // Zabezpieczenie przed "martwymi" detalami (brak operacji)
+            if (!nextOperation) {
+                // Usuń uszkodzony/zakończony detal z kolejki, aby nie blokował
+                bufferState.queue.shift();
+                console.warn(`[SmartRouting] Detal ${part.code} (${part.id}) usunięty z bufora ${bufferId} - brak kolejnej operacji.`);
+                continue; 
+            }
+            
+            // 1. Znajdź wszystkie stacje, które mogą wykonać tę operację
+            const capableStations = this.engine.config.stations.filter(s => 
+                (!s.allowedOps || s.allowedOps.length === 0) || 
+                s.allowedOps.some(op => op.id === nextOperation.id)
+            );
+            
+            if (capableStations.length === 0) {
+                // Brak stacji zdolnych do wykonania operacji - przerwij pętlę (blokada procesu)
+                break;
             }
 
-            // Oblicz wynik (Score). Mniejszy = Lepszy.
-            // Score = kolejka + to co już jedzie.
-            const score = stState.queue.length + stState.incoming;
-            candidates.push({ station, flow, score });
+            // 2. Znajdź kandydatów: stacje połączone fizycznie ORAZ mające wolne moce
+            const candidates = [];
+
+            for (const station of capableStations) {
+                const flow = this.engine.config.flows.find(f => f.from === bufferId && f.to === station.id);
+                if (!flow) continue;
+
+                const stState = this.engine.stationStates[station.id];
+                
+                // Limit Wejścia (Pull System)
+                const capacity = station.capacity || 1;
+                const inputLimit = capacity + 2; 
+                
+                if ((stState.queue.length + stState.incoming) >= inputLimit) {
+                    continue; 
+                }
+
+                // Score: Uwzględnia kolejkę (queue), detale w drodze (incoming) ORAZ zajętość maszyny (busySlots)
+                const score = stState.queue.length + stState.incoming + stState.busySlots;
+                candidates.push({ station, flow, score });
+            }
+
+            // Jeśli brak kandydatów (wszystkie stacje zapchane), przerywamy pętlę dla tego bufora
+            if (candidates.length === 0) break;
+
+            // 3. Wybierz najlepszego kandydata (najmniejszy score)
+            candidates.sort((a, b) => a.score - b.score);
+            
+            const bestTarget = candidates[0];
+            const targetStation = bestTarget.station;
+            
+            // Wykonaj przesunięcie
+            bufferState.queue.shift();
+            this.engine.recordBufferState(bufferId, bufferState.queue);
+
+            this.initiateTransport(part, bufferId, targetStation.id, 1);
+            
+            // Pętla wykona się ponownie dla kolejnego elementu w buforze
         }
-
-        // 3. Wybierz najlepszego kandydata
-        if (candidates.length === 0) return;
-
-        // Sortowanie rosnąco po score (najmniej obciążona stacja pierwsza)
-        candidates.sort((a, b) => a.score - b.score);
-        
-        const bestTarget = candidates[0];
-        const targetStation = bestTarget.station;
-        
-        // Wykonaj przesunięcie
-        bufferState.queue.shift();
-        this.engine.recordBufferState(bufferId, bufferState.queue);
-
-        this.initiateTransport(part, bufferId, targetStation.id, 1);
     }
 
     tryStartMontaz(stationId) {
