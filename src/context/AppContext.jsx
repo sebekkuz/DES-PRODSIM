@@ -42,12 +42,10 @@ export const AppProvider = ({ children }) => {
     const [simulationResults, setSimulationResults] = useState(null);
 
     // Inicjalizacja Workera
-useEffect(() => {
-        // ZMIANA: Nowa ścieżka do src/logic i type: 'module'
-        workerRef.current = new Worker(
-            new URL('../logic/simulation_worker.js', import.meta.url), 
-            { type: 'module' }
-        );
+    useEffect(() => {
+        const cacheBuster = Date.now();
+        // Worker jest w folderze public, więc ścieżka to po prostu nazwa pliku
+        workerRef.current = new Worker(`simulation_worker.js?v=${cacheBuster}`);
         
         workerRef.current.onmessage = (e) => {
             const { type, payload } = e.data;
@@ -67,12 +65,6 @@ useEffect(() => {
                  setSimulationLog(["BŁĄD KRYTYCZNY:", ...payload]);
             }
         };
-        
-        workerRef.current.onerror = (error) => {
-            console.error("Worker Error:", error);
-            alert("Wystąpił błąd w silniku symulacji (Worker). Sprawdź konsolę.");
-        };
-
         return () => workerRef.current.terminate();
     }, []);
 
